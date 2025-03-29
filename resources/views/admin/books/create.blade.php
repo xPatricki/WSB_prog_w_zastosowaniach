@@ -32,6 +32,17 @@
             </div>
             
             <div class="mb-3 row">
+                <label for="isbn" class="col-sm-3 col-form-label text-md-end">ISBN</label>
+                <div class="col-sm-9">
+                    <input type="text" class="form-control @error('isbn') is-invalid @enderror" id="isbn" name="isbn" value="{{ old('isbn') }}" required>
+                    <div class="form-text">ISBN number (unique identifier for the book).</div>
+                    @error('isbn')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+            
+            <div class="mb-3 row">
                 <label for="description" class="col-sm-3 col-form-label text-md-end">Description</label>
                 <div class="col-sm-9">
                     <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description" rows="4">{{ old('description') }}</textarea>

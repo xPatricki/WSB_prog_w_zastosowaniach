@@ -46,6 +46,7 @@ class BookController extends Controller
         $validated = $request->validate([
             'title' => 'required|max:255',
             'author' => 'required|max:255',
+            'isbn' => 'required|max:20|unique:books',
             'description' => 'nullable',
             'cover_image' => 'nullable|image|max:2048',
         ]);
@@ -53,6 +54,8 @@ class BookController extends Controller
         $book = new Book();
         $book->title = $validated['title'];
         $book->author = $validated['author'];
+        $book->isbn = $validated['isbn'];
+        $book->genre_id = 1; // Ustawiam domyślnie genre_id=1, należałoby też dodać wybór gatunku w formularzu
         $book->description = $validated['description'] ?? null;
         $book->status = 'available';
         $book->featured = $request->has('featured');
