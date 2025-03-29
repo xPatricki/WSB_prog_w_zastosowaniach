@@ -1,0 +1,28 @@
+// Bootstrap
+@import 'bootstrap/scss/bootstrap';
+
+// Custom styles
+.countdown-timer {
+    .days, .hours, .minutes, .seconds {
+        font-weight: bold;
+    }
+}
+
+// Admin dashboard styles
+.admin-stats-card {
+    transition: all 0.3s ease;
+    
+    &:hover {
+        transform: translateY(-5px);
+    }
+}
+
+// Book card styles
+.card {
+    transition: all 0.2s ease-in-out;
+    
+    &:hover {
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+}
+
