@@ -7,9 +7,12 @@ services:
     ports:
       - "8000:80"
     volumes:
-      - ./:/var/www/html
-      - ./.docker/apache/000-default.conf:/etc/apache2/sites-available/000-default.conf
-      - ./.docker/php/php.ini:/usr/local/etc/php/php.ini
+      # Use delegated mode for performance on Windows
+      - "./:/var/www/html:delegated"
+      - "./.docker/apache/000-default.conf:/etc/apache2/sites-available/000-default.conf:delegated"
+      - "./.docker/php/php.ini:/usr/local/etc/php/php.ini:delegated"
+      # Cache composer data to improve performance
+      - composer-cache:/root/.composer/cache
     environment:
       - DB_HOST=db
       - DB_PORT=3306
@@ -17,7 +20,8 @@ services:
       - DB_USERNAME=laravel
       - DB_PASSWORD=password
       - APP_ENV=local
-      - APP_DEBUG=true
+      # Reduced debugging output for better performance
+      - APP_DEBUG=false
       - APP_KEY=base64:NMsF+GQGj9NmKZUEP2ngUQ8SdYLYb4FL88zGXs34ByM=
     depends_on:
       - db
@@ -34,31 +38,32 @@ services:
       - MYSQL_DATABASE=laravel
       - MYSQL_USER=laravel
       - MYSQL_PASSWORD=password
-      - MYSQL_ROOT_PASSWORD=root_password
+      - MYSQL_ROOT_PASSWORD=rootpassword
     volumes:
-      - mysql_data:/var/lib/mysql
+      - dbdata:/var/lib/mysql
     networks:
       - laravel-network
+    restart: unless-stopped
 
   # phpMyAdmin service
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
+    restart: unless-stopped
     ports:
       - "8080:80"
     environment:
       - PMA_HOST=db
-      - PMA_PORT=3306
-      - MYSQL_ROOT_PASSWORD=root_password
+      - PMA_USER=laravel
+      - PMA_PASSWORD=password
     depends_on:
       - db
     networks:
       - laravel-network
-    restart: unless-stopped
 
 networks:
   laravel-network:
     driver: bridge
 
 volumes:
-  mysql_data:
-    driver: local
+  dbdata:
+  composer-cache:

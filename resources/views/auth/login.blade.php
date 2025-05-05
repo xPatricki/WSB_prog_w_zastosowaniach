@@ -6,6 +6,11 @@
         <div class="card">
             <div class="card-header">Login</div>
             <div class="card-body">
+                <div class="alert alert-info text-center">
+                    <strong>Demo Admin Login:</strong><br>
+                    Email: <code>admin@admin.com</code> <br>
+                    Password: <code>admin</code>
+                </div>
                 <form method="POST" action="{{ route('login') }}">
                     @csrf
                     <div class="mb-3">
@@ -49,4 +54,3 @@
     </div>
 </div>
 @endsection
-

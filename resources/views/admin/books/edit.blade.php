@@ -1,6 +1,6 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
-@section('content')
+@section('admin-content')
 <div class="mb-4">
     <h1>Edit Book</h1>
     <p class="text-muted">Make changes to the book details below.</p>
@@ -79,4 +79,3 @@
     </div>
 </div>
 @endsection
-

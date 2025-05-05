@@ -11,9 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->enum('role', ['user', 'admin'])->default('user')->after('password');
-        });
+        // The 'role' column already exists in the users table. This migration is now redundant.
+        // Schema::table('users', function (Blueprint $table) {
+        //     $table->enum('role', ['user', 'admin'])->default('user')->after('password');
+        // });
     }
 
     /**
@@ -21,9 +22,11 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('role');
-        });
+        // Only drop the column if it exists (safe-guard)
+        if (Schema::hasColumn('users', 'role')) {
+            Schema::table('users', function (Blueprint $table) {
+                $table->dropColumn('role');
+            });
+        }
     }
 };
-

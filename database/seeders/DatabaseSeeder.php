@@ -13,6 +13,17 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Create demo admin user
+        \App\Models\User::updateOrCreate(
+            ['email' => 'admin@admin.com'],
+            [
+                'name' => 'Admin',
+                'password' => bcrypt('admin'),
+                'email_verified_at' => now(),
+                'role' => 'admin',
+            ]
+        );
+
         // Create admin user
         User::create([
             'name' => 'Admin User',
@@ -35,4 +46,3 @@ class DatabaseSeeder extends Seeder
         ]);
     }
 }
-

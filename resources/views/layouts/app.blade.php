@@ -45,7 +45,7 @@
                         </li>
                         @if(auth()->user()->role === 'admin')
                             <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('admin.books.*') ? 'active' : '' }}" href="{{ route('admin.books.index') }}">Admin</a>
+                                <a class="nav-link {{ request()->routeIs('admin.*') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}">Admin</a>
                             </li>
                         @endif
                     @endauth

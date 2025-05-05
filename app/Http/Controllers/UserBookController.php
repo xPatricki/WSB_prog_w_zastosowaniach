@@ -46,6 +46,10 @@ class UserBookController extends Controller
      */
     public function borrow(Book $book)
     {
+        // Prevent admin from borrowing books
+        if (auth()->user()->role === 'admin') {
+            return redirect()->back()->with('error', 'Admin users cannot borrow books.');
+        }
         // Check if book is available
         if ($book->status !== 'available') {
             return redirect()->back()->with('error', 'This book is not available for borrowing.');
@@ -102,4 +106,3 @@ class UserBookController extends Controller
         return view('profile');
     }
 }
-

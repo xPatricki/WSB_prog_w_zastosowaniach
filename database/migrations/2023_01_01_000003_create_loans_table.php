@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained();
             $table->foreignId('book_id')->constrained();
             $table->timestamp('borrowed_at');
-            $table->timestamp('due_at');
+            $table->timestamp('due_at')->nullable();
             $table->timestamp('returned_at')->nullable();
             $table->enum('status', ['active', 'returned'])->default('active');
             $table->timestamps();

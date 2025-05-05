@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('password');
             $table->enum('role', ['user', 'admin'])->default('user');
+            $table->timestamp('email_verified_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
@@ -30,4 +31,3 @@ return new class extends Migration
         Schema::dropIfExists('users');
     }
 };
-

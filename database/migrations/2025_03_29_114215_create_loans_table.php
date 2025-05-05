@@ -11,16 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('loans', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained();
-            $table->foreignId('book_id')->constrained();
-            $table->timestamp('borrowed_at')->useCurrent();
-            $table->timestamp('due_at')->nullable();
-            $table->timestamp('returned_at')->nullable();
-            $table->enum('status', ['active', 'returned'])->default('active');
-            $table->timestamps();
-        });
+        // Duplicate migration: the 'loans' table is already created by an earlier migration.
+        // Schema::create('loans', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->foreignId('user_id')->constrained();
+        //     $table->foreignId('book_id')->constrained();
+        //     $table->timestamp('borrowed_at')->useCurrent();
+        //     $table->timestamp('due_at')->nullable();
+        //     $table->timestamp('returned_at')->nullable();
+        //     $table->enum('status', ['active', 'returned'])->default('active');
+        //     $table->timestamps();
+        // });
     }
 
     /**
@@ -28,6 +29,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('loans');
+        // Only drop if it exists and wasn't already dropped by another migration
+        if (Schema::hasTable('loans')) {
+            Schema::dropIfExists('loans');
+        }
     }
 };

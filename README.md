@@ -64,3 +64,56 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+---
+
+# WSB Library App (Dockerized Laravel)
+
+## Prerequisites (Windows)
+
+- **Docker Desktop** (https://www.docker.com/products/docker-desktop/)
+  - Make sure Docker Desktop is running before you start the app.
+- **Git** (optional, for cloning the repo)
+
+## Getting Started
+
+1. **Clone the repository** (if you haven't already):
+   ```sh
+   git clone <your-repo-url>
+   cd WSB_prog_w_zastosowaniach
+   ```
+
+2. **Start the containers:**
+   ```sh
+   docker compose up --build
+   ```
+   - This will build and start the app, database, and phpMyAdmin.
+
+3. **Run database migrations and seeders:**
+   (In a new terminal, with containers running)
+   ```sh
+   docker compose exec app php artisan migrate:fresh
+   docker compose exec app php artisan db:seed
+   ```
+
+4. **Access the app:**
+   - Laravel app: [http://localhost:8000](http://localhost:8000)
+   - phpMyAdmin: [http://localhost:8080](http://localhost:8080) (host: `db`, user: `laravel`, pass: `password`)
+
+## Demo Admin Credentials
+- **Email:** `admin@admin.com`
+- **Password:** `admin`
+
+## Features
+- Admin dashboard with charts and statistics
+- Book management (add, edit, delete, view)
+- User management
+- Loan management
+
+## Troubleshooting
+- If you get database or migration errors, try:
+  ```sh
+  docker compose exec app php artisan migrate:fresh
+  docker compose exec app php artisan db:seed
+  ```
+- Make sure Docker Desktop is running and no other services are using ports 8000/8080/3306.
