@@ -39,11 +39,13 @@ Route::middleware('auth')->group(function () {
 
 // Admin management routes
 Route::middleware(['auth'])->group(function () {
+    Route::post('/profile', [\App\Http\Controllers\ProfileController::class, 'update']);
     Route::get('/admin', function () {
         return redirect()->route('admin.dashboard');
     })->name('admin.home');
     Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
     Route::get('/admin/users', [AdminUserController::class, 'index'])->name('admin.users.index');
+    Route::post('/admin/users', [AdminUserController::class, 'store'])->name('admin.users.store');
     Route::get('/admin/users/{user}', [AdminUserController::class, 'show'])->name('admin.users.show');
     Route::put('/admin/users/{user}', [AdminUserController::class, 'update'])->name('admin.users.update');
     Route::delete('/admin/users/{user}', [AdminUserController::class, 'destroy'])->name('admin.users.destroy');

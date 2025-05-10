@@ -24,13 +24,6 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // Create admin user
-        User::create([
-            'name' => 'Admin User',
-            'email' => 'admin@example.com',
-            'password' => Hash::make('password'),
-            'role' => 'admin',
-        ]);
 
         // Create regular user
         User::create([
@@ -38,6 +31,14 @@ class DatabaseSeeder extends Seeder
             'email' => 'user@example.com',
             'password' => Hash::make('password'),
             'role' => 'user',
+        ]);
+
+        // Create BookKeeper user
+        User::create([
+            'name' => 'BookKeeper',
+            'email' => 'bookkeeper@example.com',
+            'password' => Hash::make('password'),
+            'role' => 'bookkeeper',
         ]);
         
         // Run the book seeder

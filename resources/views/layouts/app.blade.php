@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Library App</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
@@ -60,10 +61,12 @@
                         </li>
                     @else
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                                {{ auth()->user()->name }}
-                            </a>
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+    <img src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name) }}&background=0D8ABC&color=fff&size=32" alt="avatar" class="rounded-circle me-2" width="32" height="32">
+    {{ auth()->user()->name }}
+</a>
                             <ul class="dropdown-menu dropdown-menu-end">
+    <li><a class="dropdown-item" href="#" id="openProfileModal">Profile</a></li>
                                 <li>
                                     <form action="{{ route('logout') }}" method="POST">
                                         @csrf
@@ -103,6 +106,85 @@
             </p>
         </div>
     </footer>
+
+<!-- Profile Modal -->
+<div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="profileModalLabel">Edit Profile</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form id="profileForm">
+        <div class="modal-body">
+          <div id="profileFormAlert"></div>
+          <div class="mb-3">
+            <label class="form-label">Name</label>
+            <input type="text" name="name" class="form-control" value="{{ auth()->user()->name }}" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" name="email" class="form-control" value="{{ auth()->user()->email }}" required>
+          </div>
+          <hr>
+          <div class="mb-3">
+            <label class="form-label">Current Password</label>
+            <input type="password" name="current_password" class="form-control" autocomplete="current-password">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">New Password</label>
+            <input type="password" name="new_password" class="form-control" autocomplete="new-password">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Repeat New Password</label>
+            <input type="password" name="new_password_confirmation" class="form-control" autocomplete="new-password">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const profileModal = new bootstrap.Modal(document.getElementById('profileModal'));
+    document.getElementById('openProfileModal').addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('profileForm').reset();
+        document.getElementById('profileFormAlert').innerHTML = '';
+        profileModal.show();
+    });
+    document.getElementById('profileForm').onsubmit = function(e) {
+        e.preventDefault();
+        const form = this;
+        fetch('/profile', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: new FormData(form)
+        }).then(async resp => {
+            const data = await resp.json();
+            if (resp.ok && data.success) {
+                document.getElementById('profileFormAlert').innerHTML = '<div class="alert alert-success">Profile updated successfully.</div>';
+                setTimeout(() => location.reload(), 1200);
+            } else {
+                let msg = data.message || 'Error updating profile.';
+                if (data.errors) {
+                    msg += '<ul>' + Object.values(data.errors).map(e => `<li>${e}</li>`).join('') + '</ul>';
+                }
+                document.getElementById('profileFormAlert').innerHTML = `<div class="alert alert-danger">${msg}</div>`;
+            }
+        }).catch(() => {
+            document.getElementById('profileFormAlert').innerHTML = '<div class="alert alert-danger">Error updating profile.</div>';
+        });
+    };
+});
+</script>
+
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
