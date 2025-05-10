@@ -28,7 +28,9 @@ class LoanController extends Controller
     
     public function borrow(Book $book)
     {
-        if ($book->status !== 'available') {
+        $activeLoans = $book->loans()->whereNull('returned_at')->count();
+        $available = $book->quantity - $activeLoans;
+        if ($book->status !== 'available' || $available < 1) {
             return back()->with('error', 'This book is not available for borrowing.');
         }
         
@@ -39,7 +41,11 @@ class LoanController extends Controller
         $loan->due_at = now()->addDays(14); // 2 weeks loan period
         $loan->save();
         
-        $book->status = 'borrowed';
+        // If after this loan there are no copies left, set status to 'borrowed'
+        $activeLoans++;
+        if ($book->quantity - $activeLoans < 1) {
+            $book->status = 'borrowed';
+        }
         $book->save();
         
         return redirect()->route('loans.index')->with('success', 'Book borrowed successfully.');

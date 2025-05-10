@@ -18,6 +18,7 @@ class Book extends Model
         'cover_image',
         'status',
         'featured',
+        'quantity',
     ];
 
     /**

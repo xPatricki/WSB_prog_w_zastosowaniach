@@ -7,10 +7,14 @@
         <p class="text-muted">Add, edit, and manage books in the library.</p>
     </div>
     <div>
-        <a href="{{ route('admin.books.create') }}" class="btn btn-primary">
+        <a href="{{ route('admin.books.create') }}" class="btn btn-primary me-2">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
             Add Book
         </a>
+        <button type="button" class="btn btn-outline-info" id="sync-all-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.13-3.36L23 10"></path><path d="M20.49 15a9 9 0 0 1-14.13 3.36L1 14"></path></svg>
+            Sync All
+        </button>
     </div>
 </div>
 
@@ -20,22 +24,34 @@
             <thead>
                 <tr>
                     <th>Title</th>
-                    <th>Author</th>
-                    <th>Status</th>
-                    <th>Featured</th>
-                    <th class="text-end">Actions</th>
+<th>Author</th>
+<th>Quantity</th>
+<th>Status</th>
+<th>Featured</th>
+<th class="text-end">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($books as $book)
-                    <tr>
-                        <td class="fw-medium">{{ $book->title }}</td>
-                        <td>{{ $book->author }}</td>
-                        <td>
-                            <span class="badge {{ $book->status === 'available' ? 'bg-success' : 'bg-secondary' }}">
-                                {{ $book->status }}
-                            </span>
-                        </td>
+@php
+    $activeLoans = $book->loans()->whereNull('returned_at')->count();
+    $available = $book->quantity - $activeLoans;
+@endphp
+<tr @if($available < 1) style="background-color: #f8f9fa; color: #999;" @endif>
+    <td class="fw-medium">{{ $book->title }}</td>
+    <td>{{ $book->author }}</td>
+    <td>
+        @if($available > 0)
+            <span class="badge bg-success">{{ $available }} available</span>
+        @else
+            <span class="badge bg-secondary">Unavailable</span>
+        @endif
+    </td>
+    <td>
+        <span class="badge {{ $book->status === 'available' && $available > 0 ? 'bg-success' : 'bg-secondary' }}">
+            {{ $book->status }}
+        </span>
+    </td>
                         <td>
                             @if($book->featured)
                                 <span class="badge bg-primary">Featured</span>

@@ -19,18 +19,25 @@
                         @endif
                     </div>
                     
-                    @auth
-                        @if($book->status === 'available')
-                            <form action="{{ route('books.borrow', $book) }}" method="POST">
-                                @csrf
-                                <button type="submit" class="btn btn-success w-100 mb-2">Borrow This Book</button>
-                            </form>
-                        @else
-                            <button class="btn btn-secondary w-100 mb-2" disabled>Currently Unavailable</button>
-                        @endif
-                    @else
-                        <a href="{{ route('login') }}" class="btn btn-primary w-100 mb-2">Login to Borrow</a>
-                    @endauth
+                    @php
+    $activeLoans = $book->loans()->whereNull('returned_at')->count();
+    $available = $book->quantity - $activeLoans;
+@endphp
+<div class="mb-2">
+    <span class="badge bg-info">{{ $available }} available</span>
+</div>
+@auth
+    @if($book->status === 'available' && $available > 0)
+        <form action="{{ route('books.borrow', $book) }}" method="POST">
+            @csrf
+            <button type="submit" class="btn btn-success w-100 mb-2">Borrow This Book</button>
+        </form>
+    @else
+        <button class="btn btn-secondary w-100 mb-2" disabled>Currently Unavailable</button>
+    @endif
+@else
+    <a href="{{ route('login') }}" class="btn btn-primary w-100 mb-2">Login to Borrow</a>
+@endauth
                 </div>
                 
                 <div class="col-md-9">

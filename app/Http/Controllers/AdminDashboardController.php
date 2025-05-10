@@ -26,6 +26,7 @@ class AdminDashboardController extends Controller
         $loanedBooks = Book::where('status', 'borrowed')->count();
         $totalUsers = User::count();
         $activeLoans = Loan::where('status', 'active')->count();
+        $expiredLoans = Loan::where('status', 'active')->where('due_at', '<', Carbon::now())->count();
 
         // Book status pie chart
         $bookStatus = [
@@ -33,23 +34,21 @@ class AdminDashboardController extends Controller
             'borrowed' => $loanedBooks
         ];
 
-        // Books borrowed per month (last 12 months)
-        $months = collect(range(0, 11))->map(function ($i) {
-            return Carbon::now()->subMonths($i)->format('Y-m');
-        })->reverse()->values();
-        $borrowedPerMonth = $months->mapWithKeys(function ($month) {
-            $count = Loan::whereYear('borrowed_at', substr($month, 0, 4))
-                ->whereMonth('borrowed_at', substr($month, 5, 2))
-                ->count();
-            return [$month => $count];
+        // Show only the last 6 months (including current), no future months
+        $months = collect(range(0, 5))->map(function ($i) {
+            return Carbon::now()->subMonths(5 - $i)->format('F');
         });
-
-        // New users per month (last 12 months)
-        $usersPerMonth = $months->mapWithKeys(function ($month) {
-            $count = User::whereYear('created_at', substr($month, 0, 4))
-                ->whereMonth('created_at', substr($month, 5, 2))
+        $booksBorrowedPerMonth = $months->map(function ($monthName, $i) {
+            $date = Carbon::now()->subMonths(5 - $i);
+            return Loan::whereYear('borrowed_at', $date->year)
+                ->whereMonth('borrowed_at', $date->month)
                 ->count();
-            return [$month => $count];
+        });
+        $usersPerMonth = $months->map(function ($monthName, $i) {
+            $date = Carbon::now()->subMonths(5 - $i);
+            return User::whereYear('created_at', $date->year)
+                ->whereMonth('created_at', $date->month)
+                ->count();
         });
 
         return view('admin.dashboard', [
@@ -57,9 +56,10 @@ class AdminDashboardController extends Controller
             'loanedBooks' => $loanedBooks,
             'totalUsers' => $totalUsers,
             'activeLoans' => $activeLoans,
+            'expiredLoans' => $expiredLoans,
             'bookStatus' => $bookStatus,
             'months' => $months,
-            'borrowedPerMonth' => $borrowedPerMonth,
+            'booksBorrowedPerMonth' => $booksBorrowedPerMonth,
             'usersPerMonth' => $usersPerMonth,
         ]);
     }

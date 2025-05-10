@@ -99,14 +99,21 @@
         </div>
     </main>
 
-    <footer class="py-3 mt-4 border-top">
-        <div class="container text-center">
-            <p class="text-muted mb-0">
-                &copy; {{ date('Y') }} Library App. All rights reserved.
-            </p>
-        </div>
-    </footer>
+    <style>
+    html, body { height: 100%; }
+    body { display: flex; flex-direction: column; min-height: 100vh; }
+    main.min-vh-100 { flex: 1 0 auto; }
+</style>
+<footer class="py-3 border-top" style="margin-top:auto;">
+    <div class="container text-center">
+        <p class="text-muted mb-0">
+            &copy; {{ date('Y') }} Library App. All rights reserved.<br>
+            Authors: Dawid Skrzypacz, Patryk Pawlicki, Witold Mikołajczak
+        </p>
+    </div>
+</footer>
 
+@if(auth()->check())
 <!-- Profile Modal -->
 <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
   <div class="modal-dialog">
@@ -139,6 +146,7 @@
             <label class="form-label">Repeat New Password</label>
             <input type="password" name="new_password_confirmation" class="form-control" autocomplete="new-password">
           </div>
+@endif
         </div>
         <div class="modal-footer">
           <button type="submit" class="btn btn-primary">Save Changes</button>

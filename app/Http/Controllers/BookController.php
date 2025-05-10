@@ -49,6 +49,7 @@ class BookController extends Controller
             'isbn' => 'required|max:20|unique:books',
             'description' => 'nullable',
             'cover_image' => 'nullable|image|max:2048',
+            'quantity' => 'required|integer|min:1',
         ]);
         
         $book = new Book();
@@ -59,6 +60,7 @@ class BookController extends Controller
         $book->description = $validated['description'] ?? null;
         $book->status = 'available';
         $book->featured = $request->has('featured');
+        $book->quantity = $validated['quantity'];
         
         if ($request->hasFile('cover_image')) {
             $path = $request->file('cover_image')->store('covers', 'public');
@@ -83,12 +85,14 @@ class BookController extends Controller
             'author' => 'required|max:255',
             'description' => 'nullable',
             'cover_image' => 'nullable|image|max:2048',
+            'quantity' => 'required|integer|min:1',
         ]);
         
         $book->title = $validated['title'];
         $book->author = $validated['author'];
         $book->description = $validated['description'] ?? null;
         $book->featured = $request->has('featured');
+        $book->quantity = $validated['quantity'];
         
         if ($request->hasFile('cover_image')) {
             if ($book->cover_image) {
