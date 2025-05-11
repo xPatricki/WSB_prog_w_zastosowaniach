@@ -7,6 +7,8 @@ use App\Models\Book;
 use App\Models\Genre;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 class BookManagementController extends Controller
 {
@@ -184,8 +186,22 @@ if ($request->filled('cover_image_url')) {
             if ($book->cover_image) {
                 Storage::disk('public')->delete($book->cover_image);
             }
-            $book->cover_image_url = $request->input('cover_image_url');
-            $book->cover_image = null;
+            
+            // Download and store the cover image locally
+            $coverUrl = $request->input('cover_image_url');
+            $localPath = $this->downloadAndStoreCoverImage($coverUrl, $book->isbn);
+            
+            if ($localPath) {
+                // Successfully downloaded, use local image
+                $book->cover_image = $localPath;
+                $book->cover_image_url = null; // No longer needed as we have a local copy
+                \Log::info("Saved local cover for book ID {$book->id}, ISBN {$book->isbn}: {$localPath}");
+            } else {
+                // Failed to download, keep using the URL
+                $book->cover_image_url = $coverUrl;
+                $book->cover_image = null;
+                \Log::warning("Could not download cover for book ID {$book->id}, using external URL");
+            }
         }
         
         $book->save();
@@ -358,6 +374,44 @@ if ($request->filled('cover_image_url')) {
         
         return redirect()->route('admin.books.index')
                 ->with($status, $message);
+    }
+    
+    /**
+     * Helper method to download external cover images and store them locally
+     * Returns the local storage path or null if download fails
+     * 
+     * @param string $imageUrl The external URL of the image
+     * @param string $isbn The ISBN of the book (for naming)
+     * @return string|null The local storage path if successful, null if failed
+     */
+    protected function downloadAndStoreCoverImage($imageUrl, $isbn)
+    {
+        if (empty($imageUrl)) {
+            return null;
+        }
+        
+        try {
+            // Generate a unique filename including the ISBN
+            $extension = pathinfo(parse_url($imageUrl, PHP_URL_PATH), PATHINFO_EXTENSION) ?: 'jpg';
+            $filename = 'covers/' . $isbn . '_' . Str::random(8) . '.' . $extension;
+            
+            // Download the image
+            $response = Http::timeout(5)->get($imageUrl);
+            
+            if ($response->successful()) {
+                // Store the image content
+                Storage::disk('public')->put($filename, $response->body());
+                
+                // Log the successful download
+                \Log::info("Downloaded cover image for ISBN {$isbn} from {$imageUrl} to {$filename}");
+                
+                return $filename;
+            }
+        } catch (\Exception $e) {
+            \Log::error("Failed to download cover for ISBN {$isbn}: " . $e->getMessage());
+        }
+        
+        return null;
     }
     
     /**

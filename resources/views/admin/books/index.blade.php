@@ -250,7 +250,19 @@ document.addEventListener('DOMContentLoaded', function() {
         </table>
     </div>
     <div class="card-footer">
-        {{ $books->links() }}
+        <div class="pagination-container">
+            {{ $books->links('pagination::bootstrap-4') }}
+        </div>
+        <style>
+            .pagination-container .page-link {
+                padding: 0.25rem 0.5rem;
+                font-size: 0.875rem;
+            }
+            .pagination-container .page-item .page-link {
+                min-width: 30px;
+                text-align: center;
+            }
+        </style>
     </div>
 </div>
 
