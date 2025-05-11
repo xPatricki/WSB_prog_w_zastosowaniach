@@ -11,11 +11,20 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-md-3">
-                    <div class="book-cover mb-3">
-                        @if($book->cover_image)
-                            <img src="{{ $book->cover_url }}" alt="{{ $book->title }}" class="img-fluid">
+                    <div class="book-cover mb-3 position-relative" style="width:100%;height:220px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#f7f7f7;">
+                        @php
+                            $coverUrl = $book->cover_image_url ?: ($book->cover_image ? asset('storage/' . $book->cover_image) : null);
+                        @endphp
+                        <span class="spinner-border spinner-border-sm position-absolute top-50 start-50 translate-middle" style="z-index:2;display:none;" aria-hidden="true"></span>
+                        @if($coverUrl)
+                        <img src="{{ $coverUrl }}" alt="{{ $book->title }}" style="width:100%;height:100%;object-fit:cover;display:block;" onload="this.previousElementSibling.style.display='none';this.style.display='block';" onerror="this.style.display='none';this.previousElementSibling.style.display='none';this.parentNode.querySelector('.img-error').style.display='block';">
+                        <span class="img-error position-absolute top-50 start-50 translate-middle text-danger" style="display:none;z-index:3;">
+                            <svg xmlns='http://www.w3.org/2000/svg' width='48' height='48' fill='none' stroke='currentColor' stroke-width='2' viewBox='0 0 24 24'><rect x='3' y='3' width='18' height='18' rx='2' fill='#fff'/><line x1='3' y1='3' x2='21' y2='21' stroke='red' stroke-width='2'/></svg>
+                        </span>
                         @else
-                            <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="text-muted"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                        <span class="img-error position-absolute top-50 start-50 translate-middle text-danger" style="display:block;z-index:3;">
+                            <svg xmlns='http://www.w3.org/2000/svg' width='48' height='48' fill='none' stroke='currentColor' stroke-width='2' viewBox='0 0 24 24'><rect x='3' y='3' width='18' height='18' rx='2' fill='#fff'/><line x1='3' y1='3' x2='21' y2='21' stroke='red' stroke-width='2'/></svg>
+                        </span>
                         @endif
                     </div>
                     

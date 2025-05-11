@@ -6,6 +6,16 @@
     <p class="text-muted">Make changes to the book details below.</p>
 </div>
 
+<div class="text-center mb-4">
+    <div style="display:inline-block;">
+        @php
+            $coverUrl = $book->cover_image_url ?: ($book->cover_image ? asset('storage/' . $book->cover_image) : asset('images/placeholder-book.jpg'));
+        @endphp
+        <img src="{{ $coverUrl }}" alt="Book Cover" class="rounded-circle border" style="width:100px;height:100px;object-fit:cover;">
+        <div class="fw-bold mt-2">Profile Picture of the book</div>
+    </div>
+</div>
+
 <div class="card">
     <div class="card-body">
         <form action="{{ route('admin.books.update', $book) }}" method="POST" enctype="multipart/form-data">

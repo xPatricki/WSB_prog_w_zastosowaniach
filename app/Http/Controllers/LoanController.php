@@ -28,6 +28,17 @@ class LoanController extends Controller
     
     public function borrow(Book $book)
     {
+        // Ensure user is authenticated
+        if (!Auth::check()) {
+            return redirect()->route('login')
+                ->with('error', 'You must be logged in to borrow books.');
+        }
+
+        // Only users with 'user' role can borrow books
+        if (Auth::user()->role !== 'user') {
+            return back()->with('error', 'Only regular users can borrow books.');
+        }
+        
         $activeLoans = $book->loans()->whereNull('returned_at')->count();
         $available = $book->quantity - $activeLoans;
         if ($book->status !== 'available' || $available < 1) {

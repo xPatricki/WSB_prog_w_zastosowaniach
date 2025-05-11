@@ -87,25 +87,51 @@
         @foreach($featuredBooks as $book)
             <div class="col-md-3 mb-4">
                 <div class="card h-100">
-                    <div class="book-cover text-center" style="height: 120px; display: flex; align-items: center; justify-content: center; background: #f7f7f9;">
-                        @if(!empty($book->cover_url))
-                            <img src="{{ $book->cover_url }}" alt="{{ $book->title }}" class="img-fluid" style="max-height: 100px; max-width: 90px;">
-                        @elseif(!empty($book->cover_image))
-                            <img src="{{ asset('storage/covers/' . $book->cover_image) }}" alt="{{ $book->title }}" class="img-fluid" style="max-height: 100px; max-width: 90px;">
-                        @else
-                            @php
-                                $letters = strtoupper(mb_substr($book->title, 0, 2));
-                                $bg = ['#6c757d','#007bff','#6610f2','#fd7e14','#28a745','#dc3545','#20c997','#17a2b8'];
-                                $color = $bg[$book->id % count($bg)];
-                            @endphp
-                            <svg width="90" height="100" xmlns="http://www.w3.org/2000/svg">
-                                <rect width="90" height="100" rx="12" fill="{{ $color }}"/>
-                                <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-size="36" fill="#fff" font-family="Arial, sans-serif">{{ $letters }}</text>
-                            </svg>
-                        @endif
-                    </div>
-                    <div class="card-body">
-                        <h5 class="card-title text-truncate">{{ $book->title }}</h5>
+                    <div class="book-cover position-relative" style="height:120px;display:flex;align-items:center;justify-content:center;background:#f7f7f9;">
+    @php
+        // Try the same logic as the browse/details page for consistency
+        $coverUrl = $book->cover_image_url ?? null;
+        if (!$coverUrl && !empty($book->cover_image)) {
+            // Try both possible storage paths
+            if (file_exists(public_path('storage/covers/' . $book->cover_image))) {
+                $coverUrl = asset('storage/covers/' . $book->cover_image);
+            } elseif (file_exists(public_path('storage/' . $book->cover_image))) {
+                $coverUrl = asset('storage/' . $book->cover_image);
+            }
+        }
+        if (!$coverUrl) {
+            $coverUrl = asset('images/placeholder-book.jpg');
+        }
+    @endphp
+    <span class="cover-spinner position-absolute top-50 start-50 translate-middle" style="z-index:2;display:block;width:2rem;height:2rem;" aria-hidden="true">
+      <svg viewBox="0 0 50 50" style="width:2rem;height:2rem;display:block;">
+        <circle cx="25" cy="25" r="20" fill="none" stroke="#222" stroke-width="5" stroke-linecap="round" stroke-dasharray="90 60"/>
+      </svg>
+    </span>
+    @if($coverUrl)
+    <img src="{{ $coverUrl }}" alt="{{ $book->title }}" style="width:100%;height:120px;object-fit:cover;display:none;" onload="this.style.display='block';this.parentNode.querySelector('.cover-spinner').style.display='none';this.parentNode.parentNode.querySelector('.card-title').style.visibility='visible';" onerror="this.style.display='none';this.parentNode.querySelector('.cover-spinner').style.display='none';this.parentNode.querySelector('.img-error').style.display='block';this.parentNode.parentNode.querySelector('.card-title').style.visibility='visible';">
+    <span class="img-error position-absolute top-50 start-50 translate-middle text-danger" style="display:none;z-index:3;">
+        <svg xmlns='http://www.w3.org/2000/svg' width='48' height='48' fill='none' stroke='currentColor' stroke-width='2' viewBox='0 0 24 24'><rect x='3' y='3' width='18' height='18' rx='2' fill='#fff'/><line x1='3' y1='3' x2='21' y2='21' stroke='red' stroke-width='2'/></svg>
+    </span>
+    @else
+        @php
+            $letters = strtoupper(mb_substr($book->title, 0, 2));
+            $bg = ['#6c757d','#007bff','#6610f2','#fd7e14','#28a745','#dc3545','#20c997','#17a2b8'];
+            $color = $bg[$book->id % count($bg)];
+        @endphp
+        <svg width="90" height="100" xmlns="http://www.w3.org/2000/svg">
+            <rect width="90" height="100" rx="12" fill="{{ $color }}"/>
+            <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-size="36" fill="#fff" font-family="Arial, sans-serif">{{ $letters }}</text>
+        </svg>
+        <script>document.currentScript.parentNode.querySelector('.cover-spinner').style.display='none';document.currentScript.parentNode.parentNode.querySelector('.card-title').style.visibility='visible';</script>
+    @endif
+</div>
+<style>
+@keyframes spin-cascade{100%{transform:rotate(360deg);}}
+.cover-spinner svg{animation:spin-cascade 0.8s linear infinite;}
+</style>
+<div class="card-body">
+    <h5 class="card-title text-truncate" style="visibility:hidden;">{{ $book->title }}</h5>
                         <p class="card-text text-muted">{{ $book->author }}</p>
                     </div>
                     <div class="card-footer d-flex justify-content-between align-items-center">

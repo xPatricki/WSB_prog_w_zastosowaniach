@@ -6,10 +6,25 @@
         <div class="card">
             <div class="card-header">Login</div>
             <div class="card-body">
-                <div class="alert alert-info text-center">
-                    <strong>Demo Admin Login:</strong><br>
-                    Email: <code>admin@admin.com</code> <br>
-                    Password: <code>admin</code>
+                <div class="alert alert-info">
+                    <h5 class="text-center mb-3">Demo Logins</h5>
+                    <div class="row">
+                        <div class="col-md-4 text-center">
+                            <strong>Admin</strong><br>
+                            <small>Email:</small> <code>admin@admin.com</code> <br>
+                            <small>Password:</small> <code>admin</code>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <strong>Regular User</strong><br>
+                            <small>Email:</small> <code>user@example.com</code> <br>
+                            <small>Password:</small> <code>password</code>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <strong>BookKeeper</strong><br>
+                            <small>Email:</small> <code>bookkeeper@example.com</code> <br>
+                            <small>Password:</small> <code>password</code>
+                        </div>
+                    </div>
                 </div>
                 <form method="POST" action="{{ route('login') }}">
                     @csrf

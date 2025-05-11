@@ -29,15 +29,30 @@
     @forelse($books as $book)
         <div class="col-md-3 mb-4">
             <div class="card h-100">
-                <div class="book-cover">
-                    @if($book->cover_image)
-                        <img src="{{ $book->cover_url }}" alt="{{ $book->title }}" class="img-fluid" style="max-height: 100%;">
-                    @else
-                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="text-muted"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
-                    @endif
+                <div class="book-cover position-relative" style="width:100%;height:220px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#f7f7f7;">
+                    @php
+                        $coverUrl = $book->cover_image_url ?: ($book->cover_image ? asset('storage/' . $book->cover_image) : asset('images/placeholder-book.jpg'));
+                    @endphp
+                    <span class="cover-spinner position-absolute top-50 start-50 translate-middle" style="z-index:2;display:block;width:2rem;height:2rem;" aria-hidden="true">
+  <svg viewBox="0 0 50 50" style="width:2rem;height:2rem;display:block;">
+    <circle cx="25" cy="25" r="20" fill="none" stroke="#222" stroke-width="5" stroke-linecap="round" stroke-dasharray="90 60"/>
+  </svg>
+</span>
+<style>
+@keyframes spin-cascade {
+  100% { transform: rotate(360deg); }
+}
+.cover-spinner svg {
+  animation: spin-cascade 0.8s linear infinite;
+}
+</style>
+                    <img src="{{ $coverUrl }}" alt="{{ $book->title }}" style="width:100%;height:100%;object-fit:cover;display:none;" onload="this.style.display='block';this.parentNode.querySelector('.cover-spinner').style.display='none';this.parentNode.parentNode.querySelector('.card-title').style.visibility='visible';" onerror="this.style.display='none';this.parentNode.querySelector('.cover-spinner').style.display='none';this.parentNode.querySelector('.img-error').style.display='block';this.parentNode.parentNode.querySelector('.card-title').style.visibility='visible';">
+                    <span class="img-error position-absolute top-50 start-50 translate-middle text-danger" style="display:none;z-index:3;">
+                        <svg xmlns='http://www.w3.org/2000/svg' width='48' height='48' fill='none' stroke='currentColor' stroke-width='2' viewBox='0 0 24 24'><rect x='3' y='3' width='18' height='18' rx='2' fill='#fff'/><line x1='3' y1='3' x2='21' y2='21' stroke='red' stroke-width='2'/></svg>
+                    </span>
                 </div>
                 <div class="card-body">
-                    <h5 class="card-title text-truncate">{{ $book->title }}</h5>
+                    <h5 class="card-title text-truncate" style="visibility:hidden;">{{ $book->title }}</h5>
                     <p class="card-text text-muted">{{ $book->author }}</p>
                 </div>
                 <div class="card-footer d-flex justify-content-between align-items-center">

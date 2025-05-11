@@ -218,5 +218,39 @@ if ($request->filled('cover_image_url')) {
         return redirect()->route('admin.books.index')
             ->with('success', 'Book deleted successfully.');
     }
+
+    /**
+     * Bulk sync selected books with external source.
+     * Accepts array of book IDs as 'ids' in POST body.
+     * Returns JSON with per-book sync results.
+     */
+    public function bulkSync(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        if (!is_array($ids) || empty($ids)) {
+            return response()->json(['status' => 'error', 'message' => 'No books selected.'], 400);
+        }
+        $results = [];
+        foreach ($ids as $id) {
+            $book = \App\Models\Book::find($id);
+            if (!$book) {
+                $results[$id] = ['status' => 'error', 'message' => 'Book not found'];
+                continue;
+            }
+            // Simulate sync (replace with real logic)
+            // For now, just log and update timestamp
+            \Log::info("[Book Sync] Syncing book ID $id ({$book->title})");
+            $book->updated_at = now();
+            $book->save();
+            // Simulate external API call delay
+            usleep(100000); // 0.1s
+            $results[$id] = ['status' => 'success', 'message' => 'Synced'];
+        }
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Selected books synced.',
+            'results' => $results
+        ]);
+    }
 }
 

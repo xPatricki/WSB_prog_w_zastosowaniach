@@ -137,4 +137,44 @@ class BookController extends Controller
         return redirect()->route('admin.books.index')
             ->with('success', 'Book deleted successfully.');
     }
+
+    /**
+     * Bulk sync selected books (simulate sync for now)
+     */
+    public function bulkSync(\Illuminate\Http\Request $request)
+    {
+        $ids = $request->input('ids', []);
+        if (!is_array($ids) || empty($ids)) {
+            return response()->json(['status' => 'error', 'message' => 'No books selected.'], 400);
+        }
+        // Simulate sync: update updated_at timestamp
+        Book::whereIn('id', $ids)->update(['updated_at' => now()]);
+        return response()->json(['status' => 'success', 'message' => 'Selected books synced.']);
+    }
+
+    /**
+     * Bulk delete selected books
+     */
+    public function bulkDelete(\Illuminate\Http\Request $request)
+    {
+        $ids = $request->input('ids', []);
+        if (!is_array($ids) || empty($ids)) {
+            return response()->json(['status' => 'error', 'message' => 'No books selected.'], 400);
+        }
+        $failed = [];
+        foreach (Book::whereIn('id', $ids)->get() as $book) {
+            if ($book->loans()->whereNull('returned_at')->exists()) {
+                $failed[] = $book->id;
+                continue;
+            }
+            if ($book->cover_image) {
+                \Storage::disk('public')->delete($book->cover_image);
+            }
+            $book->delete();
+        }
+        if ($failed) {
+            return response()->json(['status' => 'partial', 'message' => 'Some books could not be deleted due to active loans.', 'failed' => $failed]);
+        }
+        return response()->json(['status' => 'success', 'message' => 'Selected books deleted.']);
+    }
 }

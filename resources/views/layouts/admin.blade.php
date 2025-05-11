@@ -13,15 +13,17 @@
                     <a href="{{ route('admin.books.index') }}" class="list-group-item list-group-item-action {{ request()->routeIs('admin.books.*') ? 'active' : '' }}">
                         Books
                     </a>
-                    <a href="{{ route('admin.users.index') }}" class="list-group-item list-group-item-action {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
-                        Users
-                    </a>
                     <a href="{{ route('admin.loans.index') }}" class="list-group-item list-group-item-action {{ request()->routeIs('admin.loans.*') ? 'active' : '' }}">
                         Loans
                     </a>
-                    <a href="{{ route('admin.settings') }}" class="list-group-item list-group-item-action {{ request()->routeIs('admin.settings') ? 'active' : '' }}">
-                        Settings
-                    </a>
+                    @if(strtolower(auth()->user()->role) === 'admin')
+                        <a href="{{ route('admin.users.index') }}" class="list-group-item list-group-item-action {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                            Users
+                        </a>
+                        <a href="{{ route('admin.settings') }}" class="list-group-item list-group-item-action {{ request()->routeIs('admin.settings') ? 'active' : '' }}">
+                            Settings
+                        </a>
+                    @endif
                 </div>
             </div>
         </div>

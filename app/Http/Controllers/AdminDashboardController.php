@@ -13,7 +13,13 @@ class AdminDashboardController extends Controller
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
-            if (!auth()->check() || auth()->user()->role !== 'admin') {
+            if (!auth()->check()) {
+                return redirect()->route('login');
+            }
+            
+            // Case-insensitive role check
+            $userRole = strtolower(auth()->user()->role);
+            if ($userRole !== 'admin' && $userRole !== 'bookkeeper') {
                 abort(403, 'Unauthorized');
             }
             return $next($request);
