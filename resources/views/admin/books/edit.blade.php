@@ -6,15 +6,7 @@
     <p class="text-muted">Make changes to the book details below.</p>
 </div>
 
-<div class="text-center mb-4">
-    <div style="display:inline-block;">
-        @php
-            $coverUrl = $book->cover_image_url ?: ($book->cover_image ? asset('storage/' . $book->cover_image) : asset('images/placeholder-book.jpg'));
-        @endphp
-        <img src="{{ $coverUrl }}" alt="Book Cover" class="rounded-circle border" style="width:100px;height:100px;object-fit:cover;">
-        <div class="fw-bold mt-2">Profile Picture of the book</div>
-    </div>
-</div>
+
 
 <div class="card">
     <div class="card-body">
@@ -22,17 +14,19 @@
             @csrf
             @method('PUT')
             
-            <div class="mb-3 row align-items-center">
-                <label for="isbn" class="col-sm-3 col-form-label text-md-end">ISBN</label>
-                <div class="col-sm-6">
-                    <input type="text" class="form-control @error('isbn') is-invalid @enderror" id="isbn" name="isbn" value="{{ old('isbn', $book->isbn) }}" required>
-                    <div class="form-text">ISBN number (unique identifier for the book).</div>
+            <div class="mb-3 row">
+                <label for="isbn" class="col-sm-3 col-form-label text-md-end my-auto">
+                    ISBN <span class="text-danger">*</span>
+                    <i class="ms-1 text-muted" data-bs-toggle="tooltip" data-bs-placement="top" title="ISBN number (unique identifier for the book)." style="cursor: help;">&#63;</i>
+                </label>
+                <div class="col-sm-7">
+                    <div class="input-group">
+                        <input type="text" class="form-control @error('isbn') is-invalid @enderror" id="isbn" name="isbn" value="{{ old('isbn', $book->isbn) }}" required>
+                        <button type="button" class="btn btn-outline-info" id="sync-isbn-btn">Sync</button>
+                    </div>
                     @error('isbn')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
-                </div>
-                <div class="col-sm-3">
-                    <button type="button" class="btn btn-outline-info w-100" id="sync-isbn-btn">Sync</button>
                 </div>
             </div>
             <div class="mb-3 row">
@@ -46,7 +40,7 @@
                 </div>
             </div>
             <div class="mb-3 row">
-                <label for="title" class="col-sm-3 col-form-label text-md-end">Title</label>
+                <label for="title" class="col-sm-3 col-form-label text-md-end">Title <span class="text-danger">*</span></label>
                 <div class="col-sm-9">
                     <input type="text" class="form-control @error('title') is-invalid @enderror" id="title" name="title" value="{{ old('title', $book->title) }}" required>
                     @error('title')
@@ -56,7 +50,7 @@
             </div>
             
             <div class="mb-3 row">
-                <label for="author" class="col-sm-3 col-form-label text-md-end">Author</label>
+                <label for="author" class="col-sm-3 col-form-label text-md-end">Author <span class="text-danger">*</span></label>
                 <div class="col-sm-9">
                     <input type="text" class="form-control @error('author') is-invalid @enderror" id="author" name="author" value="{{ old('author', $book->author) }}" required>
                     @error('author')
@@ -78,7 +72,10 @@
             </div>
             
             <div class="mb-3 row">
-                <label for="cover_image" class="col-sm-3 col-form-label text-md-end">Cover Image</label>
+                <label for="cover_image" class="col-sm-3 col-form-label text-md-end">
+                    Cover Image
+                    <i class="ms-1 text-muted" data-bs-toggle="tooltip" data-bs-placement="top" title="Upload a file or provide a URL. Images are automatically optimized." style="cursor: help;">&#63;</i>
+                </label>
                 <div class="col-sm-9">
                     @php
                         $coverUrl = $book->cover_image_url ?: ($book->cover_image ? asset('storage/' . $book->cover_image) : asset('images/placeholder-book.jpg'));
@@ -100,7 +97,7 @@
             </div>
 
             <div class="mb-3 row">
-                <label for="quantity" class="col-sm-3 col-form-label text-md-end">Quantity</label>
+                <label for="quantity" class="col-sm-3 col-form-label text-md-end">Quantity <span class="text-danger">*</span></label>
                 <div class="col-sm-9">
                     <input type="number" class="form-control @error('quantity') is-invalid @enderror" id="quantity" name="quantity" value="{{ old('quantity', $book->quantity) }}" min="1" required>
                     <div class="form-text">Number of copies available for this book.</div>
@@ -130,5 +127,15 @@
         </form>
     </div>
 </div>
+
+<script>
+// Initialize Bootstrap tooltips
+document.addEventListener('DOMContentLoaded', function() {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+});
+</script>
 <script src="/book_sync.js"></script>
 @endsection

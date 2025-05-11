@@ -41,6 +41,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/books/create', [BookController::class, 'create'])->name('admin.books.create');
     Route::post('/admin/books', [BookController::class, 'store'])->name('admin.books.store');
     Route::post('/admin/books/bulk-sync', [\App\Http\Controllers\Admin\BookManagementController::class, 'bulkSync'])->name('admin.books.bulkSync');
+    Route::post('/admin/books/bulk-add', [\App\Http\Controllers\Admin\BookManagementController::class, 'bulkAdd'])->name('admin.books.bulkAdd');
     Route::post('/admin/books/bulk-delete', [BookController::class, 'bulkDelete'])->name('admin.books.bulkDelete');
     Route::get('/admin/books/{book}/edit', [BookController::class, 'edit'])->name('admin.books.edit');
     Route::put('/admin/books/{book}', [BookController::class, 'update'])->name('admin.books.update');
@@ -58,8 +59,5 @@ Route::middleware(['auth', 'admin'])->group(function () {
         return view('admin.loans.index');
     })->name('admin.loans.index');
     
-    // Admin settings
-    Route::get('/admin/settings', function () {
-        return view('admin.settings');
-    })->name('admin.settings');
+
 });

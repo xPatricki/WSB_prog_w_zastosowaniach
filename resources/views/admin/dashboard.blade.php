@@ -4,40 +4,50 @@
     <h1 class="mb-4">Admin Dashboard</h1>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-<div class="d-flex mb-4 w-100 gap-4" style="justify-content:space-between;">
-    <div class="card text-white bg-primary flex-fill" style="min-width:0;">
-        <div class="card-body text-center">
-            <h5 class="card-title">Total Titles</h5>
-            <p class="card-text display-6">{{ $totalBooks }}</p>
+<div class="row mb-4">
+    <div class="col">
+        <div class="card text-white bg-primary h-100">
+            <div class="card-body text-center d-flex flex-column justify-content-center" style="height: 150px;">
+                <h5 class="card-title">Total Titles</h5>
+                <p class="card-text display-6">{{ $totalBooks }}</p>
+            </div>
         </div>
     </div>
-    <div class="card text-white bg-success flex-fill" style="min-width:0;">
-        <div class="card-body text-center">
-            <h5 class="card-title">Books Loaned</h5>
-            <p class="card-text display-6">{{ $loanedBooks }}</p>
+    <div class="col">
+        <div class="card text-white bg-success h-100">
+            <div class="card-body text-center d-flex flex-column justify-content-center" style="height: 150px;">
+                <h5 class="card-title">Books Loaned</h5>
+                <p class="card-text display-6">{{ $loanedBooks }}</p>
+            </div>
         </div>
     </div>
-    <div class="card text-white bg-info flex-fill" style="min-width:0;">
-        <div class="card-body text-center">
-            <h5 class="card-title">Total Users</h5>
-            <p class="card-text display-6">{{ $totalUsers }}</p>
+    <div class="col">
+        <div class="card text-white bg-info h-100">
+            <div class="card-body text-center d-flex flex-column justify-content-center" style="height: 150px;">
+                <h5 class="card-title">Total Users</h5>
+                <p class="card-text display-6">{{ $totalUsers }}</p>
+            </div>
         </div>
     </div>
-    <div class="card text-white bg-warning flex-fill" style="min-width:0;">
-        <div class="card-body text-center">
-            <h5 class="card-title">Active Loans</h5>
-            <p class="card-text display-6">{{ $activeLoans }}</p>
+    <div class="col">
+        <div class="card text-white bg-warning h-100">
+            <div class="card-body text-center d-flex flex-column justify-content-center" style="height: 150px;">
+                <h5 class="card-title">Active Loans</h5>
+                <p class="card-text display-6">{{ $activeLoans }}</p>
+            </div>
         </div>
     </div>
-    <div class="card text-white bg-danger flex-fill position-relative" style="min-width:0;">
-        <div class="card-body text-center position-relative">
-            <h5 class="card-title">Loans Expired</h5>
-            <p class="card-text display-6 mb-0">{{ $expiredLoans }}</p>
-            @if($expiredLoans == 0)
-                <span class="position-absolute bottom-0 end-0 p-2" style="font-size:2rem;"><i class="bi bi-check-circle-fill text-success" title="All good"></i></span>
-            @else
-                <span class="position-absolute bottom-0 end-0 p-2" style="font-size:2rem;"><i class="bi bi-x-circle-fill text-danger" title="Expired loans"></i></span>
-            @endif
+    <div class="col">
+        <div class="card text-white bg-danger h-100 position-relative">
+            <div class="card-body text-center d-flex flex-column justify-content-center" style="height: 150px;">
+                <h5 class="card-title">Loans Expired</h5>
+                <p class="card-text display-6 mb-0">{{ $expiredLoans }}</p>
+                @if($expiredLoans == 0)
+                    <span class="position-absolute bottom-0 end-0 p-2" style="font-size:2rem;"><i class="bi bi-check-circle-fill text-success" title="All good"></i></span>
+                @else
+                    <span class="position-absolute bottom-0 end-0 p-2" style="font-size:2rem;"><i class="bi bi-x-circle-fill text-danger" title="Expired loans"></i></span>
+                @endif
+            </div>
         </div>
     </div>
 </div>

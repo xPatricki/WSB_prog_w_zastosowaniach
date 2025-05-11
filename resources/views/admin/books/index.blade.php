@@ -7,10 +7,21 @@
         <p class="text-muted">Add, edit, and manage books in the library.</p>
     </div>
     <div>
-        <a href="{{ route('admin.books.create') }}" class="btn btn-primary me-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            Add Book
-        </a>
+        <div class="btn-group me-2">
+            <a href="{{ route('admin.books.create') }}" class="btn btn-primary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                Add Book
+            </a>
+            <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                <span class="visually-hidden">Toggle Dropdown</span>
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#bulkAddModal">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    Bulk Add
+                </a></li>
+            </ul>
+        </div>
         <button type="button" class="btn btn-outline-info me-2" id="sync-selected-btn" disabled>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.13-3.36L23 10"></path><path d="M20.49 15a9 9 0 0 1-14.13 3.36L1 14"></path></svg>
             Sync Selected
@@ -283,6 +294,43 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
     </div>
   </div>
+</div>
+
+<!-- Bulk Add Modal -->
+<div class="modal fade" id="bulkAddModal" tabindex="-1" aria-labelledby="bulkAddModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="bulkAddModalLabel">Bulk Add Books by ISBN</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="bulk-add-form" action="{{ route('admin.books.bulkAdd') }}" method="POST">
+                @csrf
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="isbns" class="form-label">ISBN Numbers</label>
+                        <textarea class="form-control" id="isbns" name="isbns" rows="5" placeholder="Enter multiple ISBNs separated by commas or new lines"></textarea>
+                        <div class="form-text">Each book will be automatically synchronized with external source data.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="quantity" class="form-label">Quantity for each book</label>
+                        <input type="number" class="form-control" id="quantity" name="quantity" value="1" min="1">
+                        <div class="form-text">Number of copies to add for each book.</div>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="featured" name="featured">
+                        <label class="form-check-label" for="featured">
+                            Mark all as featured books
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="bulk-add-submit">Add Books</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 @endsection

@@ -20,9 +20,6 @@
                         <a href="{{ route('admin.users.index') }}" class="list-group-item list-group-item-action {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
                             Users
                         </a>
-                        <a href="{{ route('admin.settings') }}" class="list-group-item list-group-item-action {{ request()->routeIs('admin.settings') ? 'active' : '' }}">
-                            Settings
-                        </a>
                     @endif
                 </div>
             </div>
