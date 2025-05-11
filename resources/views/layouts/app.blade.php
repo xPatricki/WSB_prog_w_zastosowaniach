@@ -41,9 +41,11 @@
                         <a class="nav-link {{ request()->routeIs('books.index') ? 'active' : '' }}" href="{{ route('books.index') }}">Browse Books</a>
                     </li>
                     @auth
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('loans.index') ? 'active' : '' }}" href="{{ route('loans.index') }}">My Books</a>
-                        </li>
+                        @if(strtolower(auth()->user()->role) === 'user')
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->routeIs('loans.index') ? 'active' : '' }}" href="{{ route('loans.index') }}">My Books</a>
+                            </li>
+                        @endif
                         @if(strtolower(auth()->user()->role) === 'admin' || strtolower(auth()->user()->role) === 'bookkeeper')
                             <li class="nav-item">
                                 <a class="nav-link {{ request()->routeIs('admin.*') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}">Admin</a>
