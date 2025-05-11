@@ -16,6 +16,7 @@ class Book extends Model
         'author',
         'description',
         'cover_image',
+        'cover_image_url',
         'status',
         'featured',
         'quantity',

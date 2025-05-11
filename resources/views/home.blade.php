@@ -87,11 +87,21 @@
         @foreach($featuredBooks as $book)
             <div class="col-md-3 mb-4">
                 <div class="card h-100">
-                    <div class="book-cover">
-                        @if($book->cover_image)
-                            <img src="{{ $book->cover_url }}" alt="{{ $book->title }}" class="img-fluid" style="max-height: 100%;">
+                    <div class="book-cover text-center" style="height: 120px; display: flex; align-items: center; justify-content: center; background: #f7f7f9;">
+                        @if(!empty($book->cover_url))
+                            <img src="{{ $book->cover_url }}" alt="{{ $book->title }}" class="img-fluid" style="max-height: 100px; max-width: 90px;">
+                        @elseif(!empty($book->cover_image))
+                            <img src="{{ asset('storage/covers/' . $book->cover_image) }}" alt="{{ $book->title }}" class="img-fluid" style="max-height: 100px; max-width: 90px;">
                         @else
-                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="text-muted"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                            @php
+                                $letters = strtoupper(mb_substr($book->title, 0, 2));
+                                $bg = ['#6c757d','#007bff','#6610f2','#fd7e14','#28a745','#dc3545','#20c997','#17a2b8'];
+                                $color = $bg[$book->id % count($bg)];
+                            @endphp
+                            <svg width="90" height="100" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="90" height="100" rx="12" fill="{{ $color }}"/>
+                                <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-size="36" fill="#fff" font-family="Arial, sans-serif">{{ $letters }}</text>
+                            </svg>
                         @endif
                     </div>
                     <div class="card-body">

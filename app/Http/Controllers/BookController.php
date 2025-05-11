@@ -43,6 +43,8 @@ class BookController extends Controller
     
     public function store(Request $request)
     {
+        file_put_contents(storage_path('logs/manual_debug.log'), "[store] called at ".now()."\n[store] request: ".json_encode($request->all())."\n", FILE_APPEND);
+
         $validated = $request->validate([
             'title' => 'required|max:255',
             'author' => 'required|max:255',
@@ -51,7 +53,8 @@ class BookController extends Controller
             'cover_image' => 'nullable|image|max:2048',
             'quantity' => 'required|integer|min:1',
         ]);
-        
+        file_put_contents(storage_path('logs/manual_debug.log'), "[store] step 2: validated: ".json_encode($validated)."\n[store] cover_image_url_from_request: ".$request->input('cover_image_url')."\n", FILE_APPEND);
+
         $book = new Book();
         $book->title = $validated['title'];
         $book->author = $validated['author'];
@@ -61,14 +64,23 @@ class BookController extends Controller
         $book->status = 'available';
         $book->featured = $request->has('featured');
         $book->quantity = $validated['quantity'];
-        
+        file_put_contents(storage_path('logs/manual_debug.log'), "[store] step 3: after base properties, cover_image_url_from_request: ".$request->input('cover_image_url').", cover_image_url_on_book: ".($book->cover_image_url ?? 'null')."\n", FILE_APPEND);
+
         if ($request->hasFile('cover_image')) {
             $path = $request->file('cover_image')->store('covers', 'public');
             $book->cover_image = $path;
+            $book->cover_image_url = null;
+            file_put_contents(storage_path('logs/manual_debug.log'), "[store] step 4: after file upload, cover_image: $path, cover_image_url: null\n", FILE_APPEND);
+        } else {
+            $book->cover_image = null;
+            $book->cover_image_url = $request->input('cover_image_url');
+            file_put_contents(storage_path('logs/manual_debug.log'), "[store] step 5: after setting url, cover_image_url: ".$book->cover_image_url."\n", FILE_APPEND);
         }
-        
+
+        file_put_contents(storage_path('logs/manual_debug.log'), "[store] step 6: before save, book: ".json_encode($book->toArray())."\n", FILE_APPEND);
         $book->save();
-        
+        file_put_contents(storage_path('logs/manual_debug.log'), "[store] step 7: after save, book: ".json_encode($book->toArray())."\n", FILE_APPEND);
+
         return redirect()->route('admin.books.index')
             ->with('success', 'Book added successfully.');
     }

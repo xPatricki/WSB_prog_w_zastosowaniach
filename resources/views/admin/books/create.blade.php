@@ -71,7 +71,8 @@
                 <div class="col-sm-9">
                     <input type="file" class="form-control @error('cover_image') is-invalid @enderror" id="cover_image" name="cover_image">
                     <div class="form-text">Optional. Max file size: 2MB. Supported formats: JPG, PNG.</div>
-                    <input type="url" class="form-control mt-2" id="cover_image_url" name="cover_image_url" placeholder="Paste cover image URL or use Sync" style="display:none;">
+                    <label for="cover_image_url" class="form-label mt-2">Cover Image URL (auto-filled by Sync or paste manually)</label>
+<input type="url" class="form-control" id="cover_image_url" name="cover_image_url" placeholder="Paste cover image URL or use Sync" value="{{ old('cover_image_url') }}">
                     <div id="cover_image_preview" class="mt-2"></div>
                     @error('cover_image')
                         <div class="invalid-feedback">{{ $message }}</div>

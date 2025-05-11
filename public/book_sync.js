@@ -2,6 +2,15 @@
 // Handles ISBN sync button and checkbox logic for both add and edit forms
 
 document.addEventListener('DOMContentLoaded', function () {
+    const form = document.querySelector('form[action*="books"]');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const coverUrlInput = document.getElementById('cover_image_url');
+            if (coverUrlInput) {
+                console.log('[DEBUG] cover_image_url at submit:', coverUrlInput.value);
+            }
+        });
+    }
     const syncBtn = document.getElementById('sync-isbn-btn');
     const syncCheckbox = document.getElementById('sync_enabled');
     const isbnInput = document.getElementById('isbn');
@@ -33,12 +42,13 @@ document.addEventListener('DOMContentLoaded', function () {
     // Live preview for pasted cover URL
     if (coverUrlInput && coverPreview) {
         coverUrlInput.addEventListener('input', function() {
-            if (coverUrlInput.value) {
-                coverPreview.innerHTML = `<img src='${coverUrlInput.value}' alt='Cover Preview' style='max-width:120px;display:block;margin-bottom:8px;'>`;
-            } else {
-                coverPreview.innerHTML = '';
-            }
-        });
+    console.log('[DEBUG] cover_image_url input changed:', coverUrlInput.value);
+    if (coverUrlInput.value) {
+        coverPreview.innerHTML = `<img src='${coverUrlInput.value}' alt='Cover Preview' style='max-width:120px;display:block;margin-bottom:8px;'>`;
+    } else {
+        coverPreview.innerHTML = '';
+    }
+});
     }
 
     if (syncBtn && isbnInput) {
@@ -85,8 +95,11 @@ document.addEventListener('DOMContentLoaded', function () {
                             }
                         } else {
                             if (coverUrlInput) {
-                                coverUrlInput.value = coverUrl;
-                                coverUrlInput.style.display = 'none';
+                                if (coverUrlInput) {
+                                    coverUrlInput.value = coverUrl;
+console.log('[DEBUG] cover_image_url set by sync:', coverUrlInput.value);
+                                    coverUrlInput.style.display = '';
+                                }
                             }
                             if (coverPreview) {
                                 coverPreview.innerHTML = `<img src='${coverUrl}' alt='Cover Preview' style='max-width:120px;display:block;margin-bottom:8px;'>`;

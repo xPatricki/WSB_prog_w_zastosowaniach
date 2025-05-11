@@ -11,11 +11,26 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
             Add Book
         </a>
-        <button type="button" class="btn btn-outline-info" id="sync-all-btn">
+        <button type="button" class="btn btn-outline-info me-2" id="sync-selected-btn">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.13-3.36L23 10"></path><path d="M20.49 15a9 9 0 0 1-14.13 3.36L1 14"></path></svg>
-            Sync All
+            Sync Selected
+        </button>
+        <button type="button" class="btn btn-outline-danger" id="delete-selected-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+            Delete Selected
         </button>
     </div>
+<script>
+// Bulk select
+const selectAll = document.getElementById('select-all-books');
+const checkboxes = document.querySelectorAll('.select-book');
+if (selectAll) {
+    selectAll.addEventListener('change', function() {
+        checkboxes.forEach(cb => cb.checked = selectAll.checked);
+    });
+}
+// TODO: Wire up Sync Selected and Delete Selected actions
+</script>
 </div>
 
 <div class="card">
@@ -23,7 +38,9 @@
         <table class="table table-hover align-middle mb-0">
             <thead>
                 <tr>
-                    <th>Title</th>
+                    <th><input type="checkbox" id="select-all-books"></th>
+<th>Cover</th>
+<th>Title</th>
 <th>Author</th>
 <th>Quantity</th>
 <th>Status</th>
@@ -36,8 +53,11 @@
 @php
     $activeLoans = $book->loans()->whereNull('returned_at')->count();
     $available = $book->quantity - $activeLoans;
+    $coverUrl = $book->cover_image_url ?: ($book->cover_image ? asset('storage/' . $book->cover_image) : asset('images/placeholder-book.jpg'));
 @endphp
 <tr @if($available < 1) style="background-color: #f8f9fa; color: #999;" @endif>
+    <td><input type="checkbox" class="select-book" value="{{ $book->id }}"></td>
+    <td><img src="{{ $coverUrl }}" alt="Cover" class="rounded-circle" style="width:40px;height:40px;object-fit:cover;"></td>
     <td class="fw-medium">{{ $book->title }}</td>
     <td>{{ $book->author }}</td>
     <td>

@@ -1,0 +1,7 @@
+Sync All button functionality on the Admin Books Page -> change to sync selected
+Add ability to select the books on the Admin -> Books page and perform bulk operations like sync selected, delete selected
+Book cover preview visible in the Edit page on top as "Profile Picture of the book"
+Book cover visible on the Admin -> Books table the same as user profile profiles
+Book Cover visible on main page, browse books, loans and other Book related sources
+Admin -> Loans Working page with ability to sort and filter current loans for example. overdue loans, loans with lest than x days, sort
+Remove Admin -> Settings page and related itemsBooks deletion confirmation modal is default, change it to the simmilar modal of the user deletion confirmation

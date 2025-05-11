@@ -70,13 +70,19 @@
             <div class="mb-3 row">
                 <label for="cover_image" class="col-sm-3 col-form-label text-md-end">Cover Image</label>
                 <div class="col-sm-9">
-                    @if($book->cover_image)
+                    @php
+                        $coverUrl = $book->cover_image_url ?: ($book->cover_image ? asset('storage/' . $book->cover_image) : asset('images/placeholder-book.jpg'));
+                    @endphp
+                    @if($coverUrl)
                         <div class="mb-2">
-                            <img src="{{ $book->cover_url }}" alt="{{ $book->title }}" class="img-thumbnail" style="max-height: 150px;">
+                            <img src="{{ $coverUrl }}" alt="{{ $book->title }}" class="img-thumbnail" style="max-height: 150px;">
                         </div>
                     @endif
                     <input type="file" class="form-control @error('cover_image') is-invalid @enderror" id="cover_image" name="cover_image">
                     <div class="form-text">Optional. Max file size: 2MB. Supported formats: JPG, PNG.</div>
+                    <label for="cover_image_url" class="form-label mt-2">Cover Image URL (auto-filled by Sync or paste manually)</label>
+                    <input type="url" class="form-control" id="cover_image_url" name="cover_image_url" placeholder="Paste cover image URL or use Sync" value="{{ old('cover_image_url', $book->cover_image_url) }}">
+                    <div id="cover_image_preview" class="mt-2"></div>
                     @error('cover_image')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror

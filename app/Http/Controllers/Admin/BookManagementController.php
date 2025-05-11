@@ -63,6 +63,12 @@ class BookManagementController extends Controller
      */
     public function store(Request $request)
     {
+        file_put_contents(storage_path('logs/manual_debug.log'), "[store] called at ".now()."\n[store] request: ".json_encode($request->all())."\n", FILE_APPEND);
+
+        \Log::info('Book store step 1: incoming request', [
+            'request_all' => $request->all(),
+        ]);
+
         $validated = $request->validate([
             'title' => 'required|max:255',
             'author' => 'required|max:255',
@@ -71,23 +77,52 @@ class BookManagementController extends Controller
             'description' => 'nullable',
             'cover_image' => 'nullable|image|max:2048',
         ]);
-        
+        \Log::info('Book store step 2: validated', [
+            'validated' => $validated,
+            'cover_image_url_from_request' => $request->input('cover_image_url'),
+        ]);
+
         $book = new Book();
         $book->title = $validated['title'];
         $book->author = $validated['author'];
         $book->isbn = $validated['isbn'];
         $book->genre_id = $validated['genre_id'];
         $book->description = $validated['description'] ?? null;
+        \Log::info('Book store step 3: after base properties', [
+            'cover_image_url_from_request' => $request->input('cover_image_url'),
+            'cover_image_url_on_book' => $book->cover_image_url ?? null,
+        ]);
+
+        // Set status
         $book->status = 'available';
-        
-        // Handle cover image upload
+
+        // Handle cover image upload or URL
         if ($request->hasFile('cover_image')) {
             $path = $request->file('cover_image')->store('covers', 'public');
             $book->cover_image = $path;
+            $book->cover_image_url = null;
+            \Log::info('Book store step 4: after file upload', [
+                'cover_image' => $book->cover_image,
+                'cover_image_url' => $book->cover_image_url,
+            ]);
+        } else {
+            $book->cover_image = null;
+            $book->cover_image_url = $request->input('cover_image_url');
+            \Log::info('Book store step 5: after setting url', [
+                'cover_image_url' => $book->cover_image_url,
+            ]);
         }
-        
+
+        \Log::info('Book store step 6: before save', [
+            'book' => $book->toArray(),
+        ]);
+
         $book->save();
-        
+
+        \Log::info('Book store step 7: after save', [
+            'book' => $book->toArray(),
+        ]);
+
         return redirect()->route('admin.books.index')
             ->with('success', 'Book added successfully.');
     }
@@ -131,16 +166,26 @@ class BookManagementController extends Controller
         $book->isbn = $validated['isbn'];
         $book->genre_id = $validated['genre_id'];
         $book->description = $validated['description'] ?? null;
+if ($request->filled('cover_image_url')) {
+    $book->cover_image_url = $request->input('cover_image_url');
+}
         
-        // Handle cover image upload
+        // Handle cover image upload or URL
         if ($request->hasFile('cover_image')) {
             // Delete old image if exists
             if ($book->cover_image) {
                 Storage::disk('public')->delete($book->cover_image);
             }
-            
             $path = $request->file('cover_image')->store('covers', 'public');
             $book->cover_image = $path;
+            $book->cover_image_url = null; // Clear URL if file uploaded
+        } elseif ($request->filled('cover_image_url')) {
+            // Delete old image if exists
+            if ($book->cover_image) {
+                Storage::disk('public')->delete($book->cover_image);
+            }
+            $book->cover_image_url = $request->input('cover_image_url');
+            $book->cover_image = null;
         }
         
         $book->save();
