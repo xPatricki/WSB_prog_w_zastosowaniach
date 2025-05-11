@@ -289,17 +289,13 @@ if ($request->filled('cover_image_url')) {
                 
                 // Call the OpenLibrary API
                 $apiUrl = "https://openlibrary.org/api/books?bibkeys=ISBN:{$isbn}&format=json&jscmd=data";
-                file_put_contents(storage_path('logs/manual_debug.log'), "[bulkAdd] Calling API: {$apiUrl}\n", FILE_APPEND);
                 
                 $response = file_get_contents($apiUrl);
                 $bookData = json_decode($response, true);
                 
-                file_put_contents(storage_path('logs/manual_debug.log'), "[bulkAdd] API response: ".substr(json_encode($bookData), 0, 300)."...\n", FILE_APPEND);
-                
                 if (!isset($bookData["ISBN:{$isbn}"])) {
                     $messages[] = "ISBN {$isbn}: No data found";
                     $notFound++;
-                    file_put_contents(storage_path('logs/manual_debug.log'), "[bulkAdd] No data found for ISBN: {$isbn}\n", FILE_APPEND);
                     continue;
                 }
                 
@@ -312,8 +308,6 @@ if ($request->filled('cover_image_url')) {
                 $book->quantity = $quantity;
                 $book->featured = $featured;
                 $book->genre_id = 1; // Default to genre ID 1
-                
-                file_put_contents(storage_path('logs/manual_debug.log'), "[bulkAdd] Creating new book with ISBN: {$isbn}\n", FILE_APPEND);
                 
                 // Set data from API
                 if (isset($openLibraryData['title'])) {
@@ -347,13 +341,10 @@ if ($request->filled('cover_image_url')) {
                 }
                 
                 try {
-                    file_put_contents(storage_path('logs/manual_debug.log'), "[bulkAdd] Before save, book data: ".json_encode($book->toArray())."\n", FILE_APPEND);
                     $book->save();
-                    file_put_contents(storage_path('logs/manual_debug.log'), "[bulkAdd] Book saved successfully with ID: {$book->id}\n", FILE_APPEND);
                     $added++;
                     $messages[] = "ISBN {$isbn}: Added successfully";
                 } catch (\Exception $saveEx) {
-                    file_put_contents(storage_path('logs/manual_debug.log'), "[bulkAdd] Error saving book: {$saveEx->getMessage()}\n", FILE_APPEND);
                     throw $saveEx; // Re-throw to be caught by the outer catch block
                 }
                 

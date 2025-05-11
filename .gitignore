@@ -16,6 +16,11 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
+# Laravel logs
+/storage/logs/laravel.log
+/storage/logs/manual_debug.log
+/storage/logs/*.log
+
 # env files
 .env*
 
