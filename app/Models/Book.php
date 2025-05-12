@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -30,6 +31,14 @@ class Book extends Model
     public function loans()
     {
         return $this->hasMany(Loan::class);
+    }
+    
+    /**
+     * The genres that belong to the book.
+     */
+    public function genres(): BelongsToMany
+    {
+        return $this->belongsToMany(Genre::class);
     }
     
     /**
