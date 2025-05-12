@@ -81,6 +81,7 @@ export default function MyBooksPage() {
       id: 1,
       title: "The Great Gatsby",
       author: "F. Scott Fitzgerald",
+      coverImage: "/images/book-covers/great-gatsby.jpg",
       borrowedDate: new Date("2023-03-15"),
       dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
     },
@@ -88,6 +89,7 @@ export default function MyBooksPage() {
       id: 2,
       title: "To Kill a Mockingbird",
       author: "Harper Lee",
+      coverImage: "/images/book-covers/mockingbird.jpg",
       borrowedDate: new Date("2023-03-10"),
       dueDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days from now
     },
@@ -95,6 +97,7 @@ export default function MyBooksPage() {
       id: 3,
       title: "1984",
       author: "George Orwell",
+      coverImage: "/images/book-covers/1984.jpg",
       borrowedDate: new Date("2023-03-01"),
       dueDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago (overdue)
     },
@@ -107,6 +110,7 @@ export default function MyBooksPage() {
       author: "Jane Austen",
       borrowedDate: new Date("2023-02-15"),
       returnedDate: new Date("2023-03-01"),
+      returnedOnTime: true,
     },
     {
       id: 5,
@@ -114,6 +118,7 @@ export default function MyBooksPage() {
       author: "J.R.R. Tolkien",
       borrowedDate: new Date("2023-01-20"),
       returnedDate: new Date("2023-02-10"),
+      returnedOnTime: true,
     },
   ]
 
@@ -131,14 +136,30 @@ export default function MyBooksPage() {
             <TabsTrigger value="history">History</TabsTrigger>
           </TabsList>
           <TabsContent value="current" className="mt-6">
-            <div className="grid gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {currentBooks.map((book) => (
                 <Card key={book.id}>
-                  <CardHeader>
-                    <CardTitle>{book.title}</CardTitle>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-lg">{book.title}</CardTitle>
                     <CardDescription>{book.author}</CardDescription>
                   </CardHeader>
-                  <CardContent>
+                  <div className="flex justify-center p-4 bg-muted/30">
+                    {book.coverImage ? (
+                      <img 
+                        src={book.coverImage} 
+                        alt={book.title} 
+                        className="h-[150px] object-contain"
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center justify-center text-muted-foreground h-[150px] w-full">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" viewBox="0 0 16 16">
+                          <path d="M1 2.828c.885-.37 2.154-.769 3.388-.893 1.33-.134 2.458.063 3.112.752v9.746c-.935-.53-2.12-.603-3.213-.493-1.18.12-2.37.461-3.287.811V2.828zm7.5-.141c.654-.689 1.782-.886 3.112-.752 1.234.124 2.503.523 3.388.893v9.923c-.918-.35-2.107-.692-3.287-.81-1.094-.111-2.278-.039-3.213.492V2.687zM8 1.783C7.015.936 5.587.81 4.287.94c-1.514.153-3.042.672-3.994 1.105A.5.5 0 0 0 0 2.5v11a.5.5 0 0 0 .707.455c.882-.4 2.303-.881 3.68-1.02 1.409-.142 2.59.087 3.223.877a.5.5 0 0 0 .78 0c.633-.79 1.814-1.019 3.222-.877 1.378.139 2.8.62 3.681 1.02A.5.5 0 0 0 16 13.5v-11a.5.5 0 0 0-.293-.455c-.952-.433-2.48-.952-3.994-1.105C10.413.809 8.985.936 8 1.783z"/>
+                        </svg>
+                        <p className="text-xs mt-2">No cover available</p>
+                      </div>
+                    )}
+                  </div>
+                  <CardContent className="pt-4">
                     <div className="grid gap-2">
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Borrowed:</span>
@@ -162,36 +183,46 @@ export default function MyBooksPage() {
             </div>
           </TabsContent>
           <TabsContent value="history" className="mt-6">
-            <div className="grid gap-6">
-              {historyBooks.map((book) => (
-                <Card key={book.id}>
-                  <CardHeader>
-                    <CardTitle>{book.title}</CardTitle>
-                    <CardDescription>{book.author}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid gap-2">
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Borrowed:</span>
-                        <span>{book.borrowedDate.toLocaleDateString()}</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Returned:</span>
-                        <span>{book.returnedDate.toLocaleDateString()}</span>
-                      </div>
-                      <div className="flex items-center justify-center mt-4 text-green-600">
-                        <CheckCircle className="h-5 w-5 mr-2" />
-                        <span>Returned on time</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                  <CardFooter>
-                    <Button variant="outline" className="w-full">
-                      Borrow Again
-                    </Button>
-                  </CardFooter>
-                </Card>
-              ))}
+            <div className="rounded-md border">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b bg-muted/50">
+                    <th className="h-10 px-4 text-left font-medium">Book</th>
+                    <th className="h-10 px-4 text-left font-medium">Borrowed</th>
+                    <th className="h-10 px-4 text-left font-medium">Returned</th>
+                    <th className="h-10 px-4 text-left font-medium">Status</th>
+                    <th className="h-10 px-4 text-right font-medium">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {historyBooks.map((book) => (
+                    <tr key={book.id} className="border-b">
+                      <td className="p-4">
+                        <div className="font-medium">{book.title}</div>
+                        <div className="text-sm text-muted-foreground">{book.author}</div>
+                      </td>
+                      <td className="p-4">{book.borrowedDate.toLocaleDateString()}</td>
+                      <td className="p-4">{book.returnedDate.toLocaleDateString()}</td>
+                      <td className="p-4">
+                        {book.returnedOnTime ? (
+                          <div className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-green-50 text-green-600">
+                            <CheckCircle className="h-3 w-3 mr-1" /> Returned on time
+                          </div>
+                        ) : (
+                          <div className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-red-50 text-red-600">
+                            <AlertTriangle className="h-3 w-3 mr-1" /> Returned late
+                          </div>
+                        )}
+                      </td>
+                      <td className="p-4 text-right">
+                        <Button variant="outline" size="sm">
+                          Borrow Again
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </TabsContent>
         </Tabs>

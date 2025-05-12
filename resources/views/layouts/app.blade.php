@@ -115,8 +115,8 @@
     </div>
 </footer>
 
-@if(auth()->check())
-<!-- Profile Modal -->
+@auth
+<!-- Profile Modal - Only visible to logged in users -->
 <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -148,7 +148,6 @@
             <label class="form-label">Repeat New Password</label>
             <input type="password" name="new_password_confirmation" class="form-control" autocomplete="new-password">
           </div>
-@endif
         </div>
         <div class="modal-footer">
           <button type="submit" class="btn btn-primary">Save Changes</button>
@@ -157,17 +156,26 @@
     </div>
   </div>
 </div>
+@endauth
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    @auth
     const profileModal = new bootstrap.Modal(document.getElementById('profileModal'));
-    document.getElementById('openProfileModal').addEventListener('click', function(e) {
+    const openProfileModalBtn = document.getElementById('openProfileModal');
+    
+    if (openProfileModalBtn) {
+        openProfileModalBtn.addEventListener('click', function(e) {
         e.preventDefault();
         document.getElementById('profileForm').reset();
         document.getElementById('profileFormAlert').innerHTML = '';
         profileModal.show();
     });
-    document.getElementById('profileForm').onsubmit = function(e) {
+    }
+    
+    const profileForm = document.getElementById('profileForm');
+    if (profileForm) {
+        profileForm.onsubmit = function(e) {
         e.preventDefault();
         const form = this;
         fetch('/profile', {
@@ -192,11 +200,16 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('profileFormAlert').innerHTML = '<div class="alert alert-danger">Error updating profile.</div>';
         });
     };
+    }
+    @endauth
 });
 </script>
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    @stack('scripts')
+    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize Bootstrap tooltips

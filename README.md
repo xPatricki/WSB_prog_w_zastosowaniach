@@ -1,53 +1,176 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Library Management System
 
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo">
 </p>
 
-## About Laravel
+## Project Overview
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+This Library Management System is a web application that allows librarians to manage books, users, and loans efficiently. It features role-based access control with three user types:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **Administrators**: Full system access including user management
+- **Bookkeepers**: Book and loan management
+- **Regular Users**: Browse books and manage their own loans
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Features
 
-## Learning Laravel
+- User authentication with role-based access control
+- Book management (add, edit, delete)
+- Bulk book addition using ISBN numbers
+- Automated book data retrieval from OpenLibrary API
+- Book cover image caching for improved performance
+- Loan management (borrow, return, track due dates)
+- User profile management
+- Admin dashboard with statistics
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Requirements
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+- PHP 8.1 or higher
+- Composer
+- MySQL or another Laravel-supported database
+- Node.js and npm (for frontend assets)
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Installation
 
-## Laravel Sponsors
+### Step 1: Clone the Repository
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```bash
+git clone <repository-url>
+cd WSB_prog_w_zastosowaniach
+```
 
-### Premium Partners
+### Step 2: Install Dependencies
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+```bash
+composer install
+npm install
+npm run build
+```
+
+### Step 3: Configure Environment
+
+```bash
+cp .env.example .env
+php artisan key:generate
+```
+
+Edit the `.env` file to configure your database connection:
+
+```
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=library_management
+DB_USERNAME=your_database_username
+DB_PASSWORD=your_database_password
+```
+
+### Step 4: Setup Database
+
+```bash
+php artisan migrate --seed
+```
+
+This will create the database structure and seed it with:
+- Default users (admin, bookkeeper, regular user)
+- Genre categories
+
+### Step 5: Create Storage Link
+
+```bash
+php artisan storage:link
+```
+
+## Running the Application
+
+```bash
+php artisan serve
+```
+
+Access the application at http://localhost:8000
+
+## Default Login Credentials
+
+- **Admin User**:
+  - Email: admin@admin.com
+  - Password: admin
+
+- **Bookkeeper User**:
+  - Email: bookkeeper@example.com
+  - Password: password
+
+- **Regular User**:
+  - Email: user@example.com
+  - Password: password
+
+## Verification Steps
+
+Follow these steps to ensure the application is working correctly:
+
+### 1. User Authentication
+
+- [ ] Navigate to the login page
+- [ ] Login with the admin credentials
+- [ ] Verify you can access the admin dashboard
+- [ ] Logout and login with bookkeeper credentials
+- [ ] Verify bookkeeper access restrictions
+- [ ] Logout and login with regular user credentials
+- [ ] Verify user role restrictions
+
+### 2. Book Management
+
+- [ ] Login as admin or bookkeeper
+- [ ] Navigate to the Books section in admin panel
+- [ ] Add a new book manually
+- [ ] Edit the added book
+- [ ] Test bulk add feature using ISBNs from ISBN_LIST.txt
+- [ ] Verify books appear in both admin panel and public listing
+
+### 3. Loan System
+
+- [ ] Login as a regular user
+- [ ] Browse available books
+- [ ] Borrow a book
+- [ ] Verify the book appears in the user's "My Books" section
+- [ ] Return the book
+- [ ] Verify loan history is maintained
+
+### 4. User Management
+
+- [ ] Login as admin
+- [ ] Navigate to Users section
+- [ ] Create a new user
+- [ ] Assign different roles
+- [ ] Test role permissions
+
+### 5. Troubleshooting
+
+If you encounter issues:
+
+- Check storage permissions (storage directory should be writable)
+- Ensure database connection is properly configured
+- Look at Laravel logs in `storage/logs/laravel.log`
+- Verify the public storage symlink exists
+
+## Adding Books via Bulk Add
+
+The system includes a bulk add feature to quickly add books using ISBN numbers. A sample list of ISBNs is provided in the `ISBN_LIST.txt` file.
+
+1. Login as admin or bookkeeper
+2. Go to Books section in admin panel
+3. Click on the dropdown next to "Add Book" and select "Bulk Add"
+4. Enter ISBNs (separated by commas, spaces, or new lines)
+5. Submit to create new book entries
+
+## Authors
+
+- Dawid Skrzypacz
+- Patryk Pawlicki
+- Witold Mikołajczak
+
+## License
+
+The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
 
 ## Contributing
 

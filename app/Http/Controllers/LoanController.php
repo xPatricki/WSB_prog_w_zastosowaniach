@@ -38,6 +38,25 @@ class LoanController extends Controller
         if (Auth::user()->role !== 'user') {
             return back()->with('error', 'Only regular users can borrow books.');
         }
+
+        // Check if user already has a copy of this book
+        $hasBookAlready = Loan::where('user_id', Auth::id())
+            ->where('book_id', $book->id)
+            ->whereNull('returned_at')
+            ->exists();
+        
+        if ($hasBookAlready) {
+            return back()->with('error', 'You already have a copy of this book. You can only borrow one copy of each book.');
+        }
+        
+        // Check if user has reached the maximum allowed books (3)
+        $currentlyBorrowedCount = Loan::where('user_id', Auth::id())
+            ->whereNull('returned_at')
+            ->count();
+            
+        if ($currentlyBorrowedCount >= 3) {
+            return back()->with('error', 'You have reached the maximum limit of 3 borrowed books. Please return a book before borrowing another one.');
+        }
         
         $activeLoans = $book->loans()->whereNull('returned_at')->count();
         $available = $book->quantity - $activeLoans;

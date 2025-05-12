@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="row justify-content-center">
-    <div class="col-md-6">
+    <div class="col-md-8">
         <div class="card">
             <div class="card-header">Login</div>
             <div class="card-body">
@@ -13,16 +13,25 @@
                             <strong>Admin</strong><br>
                             <small>Email:</small> <code>admin@admin.com</code> <br>
                             <small>Password:</small> <code>admin</code>
+                            <div class="mt-2">
+                                <button type="button" class="btn btn-sm btn-outline-primary select-demo" data-email="admin@admin.com" data-password="admin">Select</button>
+                            </div>
                         </div>
                         <div class="col-md-4 text-center">
                             <strong>Regular User</strong><br>
                             <small>Email:</small> <code>user@example.com</code> <br>
                             <small>Password:</small> <code>password</code>
+                            <div class="mt-2">
+                                <button type="button" class="btn btn-sm btn-outline-primary select-demo" data-email="user@example.com" data-password="password">Select</button>
+                            </div>
                         </div>
                         <div class="col-md-4 text-center">
                             <strong>BookKeeper</strong><br>
                             <small>Email:</small> <code>bookkeeper@example.com</code> <br>
                             <small>Password:</small> <code>password</code>
+                            <div class="mt-2">
+                                <button type="button" class="btn btn-sm btn-outline-primary select-demo" data-email="bookkeeper@example.com" data-password="password">Select</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -69,3 +78,32 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add event listeners to all select-demo buttons
+        const selectButtons = document.querySelectorAll('.select-demo');
+        
+        selectButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Get the email and password from data attributes
+                const email = this.getAttribute('data-email');
+                const password = this.getAttribute('data-password');
+                
+                // Fill the form fields
+                document.getElementById('email').value = email;
+                document.getElementById('password').value = password;
+                
+                // Optional: Add visual feedback
+                button.classList.add('btn-success');
+                button.classList.remove('btn-outline-primary');
+                setTimeout(() => {
+                    button.classList.add('btn-outline-primary');
+                    button.classList.remove('btn-success');
+                }, 1000);
+            });
+        });
+    });
+</script>
+@endpush

@@ -49,7 +49,10 @@
                     <p class="text-muted small">Monday to Saturday, Closed on Sundays</p>
                 </div>
                 <div class="card-footer">
-                    <a href="#" class="btn btn-outline-secondary w-100">Contact Us</a>
+                    <a href="https://www.google.com/maps/dir/?api=1&destination=52.40456833352429,16.922126635948416" target="_blank" class="btn btn-primary w-100">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        Get Directions
+                    </a>
                 </div>
             </div>
         </div>
@@ -137,14 +140,16 @@
                     <div class="card-footer d-flex justify-content-between align-items-center">
                         <a href="{{ route('books.show', $book) }}" class="btn btn-sm btn-primary">View Details</a>
                         @auth
-                            @if($book->status === 'available')
+                            @if(auth()->user()->role === 'user' && $book->status === 'available')
                                 <form action="{{ route('books.borrow', $book) }}" method="POST">
                                     @csrf
                                     <button type="submit" class="btn btn-sm btn-outline-success">Borrow</button>
                                 </form>
-                            @else
+                            @elseif($book->status !== 'available')
                                 <span class="badge bg-secondary">Unavailable</span>
                             @endif
+                        @else
+                            <small class="text-muted">Login to borrow</small>
                         @endauth
                     </div>
                 </div>
