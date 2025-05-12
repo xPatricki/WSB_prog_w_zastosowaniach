@@ -183,6 +183,51 @@ document.addEventListener('DOMContentLoaded', function() {
     checkboxes.forEach(cb => cb.checked = false);
     if (selectAll) selectAll.checked = false;
     updateBulkButtons();
+    
+    // Auto-submit per page form when selection changes
+    document.getElementById('per-page-select').addEventListener('change', function() {
+        document.getElementById('per-page-form').submit();
+    });
+    
+    // Individual book sync button handler
+    document.querySelectorAll('.book-sync-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const bookId = this.dataset.bookId;
+            
+            // Show loading state
+            const originalContent = this.innerHTML;
+            this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+            this.disabled = true;
+            
+            fetch("{{ route('admin.books.bulkSync') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ book_ids: [bookId] })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Reset button
+                this.innerHTML = originalContent;
+                this.disabled = false;
+                
+                if (data.success) {
+                    showAlert('success', data.message || 'Book synced successfully');
+                } else {
+                    showAlert('danger', data.message || 'Error syncing book');
+                }
+            })
+            .catch(error => {
+                // Reset button
+                this.innerHTML = originalContent;
+                this.disabled = false;
+                showAlert('danger', 'Error syncing book: ' + error);
+            });
+        });
+    });
+    
 });
 </script>
 
@@ -196,7 +241,6 @@ document.addEventListener('DOMContentLoaded', function() {
 <th>Title</th>
 <th>Author</th>
 <th>Quantity</th>
-<th>Status</th>
 <th>Featured</th>
 <th class="text-end">Actions</th>
                 </tr>
@@ -211,8 +255,8 @@ document.addEventListener('DOMContentLoaded', function() {
 <tr @if($available < 1) style="background-color: #f8f9fa; color: #999;" @endif>
     <td><input type="checkbox" class="select-book" value="{{ $book->id }}"></td>
     <td><img src="{{ $coverUrl }}" alt="Cover" class="rounded-circle" style="width:40px;height:40px;object-fit:cover;"></td>
-    <td class="fw-medium">{{ $book->title }}</td>
-    <td>{{ $book->author }}</td>
+    <td class="fw-medium"><div class="text-truncate" style="max-width: 250px;" title="{{ $book->title }}">{{ $book->title }}</div></td>
+    <td><div class="text-truncate" style="max-width: 180px;" title="{{ $book->author }}">{{ $book->author }}</div></td>
     <td>
         @if($available > 0)
             <span class="badge bg-success">{{ $available }} available</span>
@@ -220,17 +264,9 @@ document.addEventListener('DOMContentLoaded', function() {
             <span class="badge bg-secondary">Unavailable</span>
         @endif
     </td>
-    <td>
-        <span class="badge {{ $book->status === 'available' && $available > 0 ? 'bg-success' : 'bg-secondary' }}">
-            {{ $book->status }}
-        </span>
-    </td>
+
                         <td>
-                            @if($book->featured)
-                                <span class="badge bg-primary">Featured</span>
-                            @else
-                                <span class="badge bg-light text-dark">No</span>
-                            @endif
+                            {{ $book->featured ? 'Yes' : 'No' }}
                         </td>
                         <td class="text-end">
                             <div class="d-flex justify-content-end">
@@ -238,6 +274,10 @@ document.addEventListener('DOMContentLoaded', function() {
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                                     <span class="visually-hidden">Edit</span>
                                 </a>
+                                <button type="button" class="btn btn-sm btn-outline-info me-2 book-sync-btn" data-book-id="{{ $book->id }}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.13-3.36L23 10"></path><path d="M20.49 15a9 9 0 0 1-14.13 3.36L1 14"></path></svg>
+                                    <span class="visually-hidden">Sync</span>
+                                </button>
                                 <button type="button" class="btn btn-sm btn-outline-danger show-delete-modal" data-book-title="{{ $book->title }}" data-delete-url="{{ route('admin.books.destroy', $book) }}">
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
     <span class="visually-hidden">Delete</span>
@@ -250,8 +290,22 @@ document.addEventListener('DOMContentLoaded', function() {
         </table>
     </div>
     <div class="card-footer">
-        <div class="pagination-container">
-            {{ $books->links('pagination::bootstrap-4') }}
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+                <span class="me-2">Show:</span>
+                <form id="per-page-form" action="{{ route('admin.books.index') }}" method="GET" class="d-inline">
+                    <select id="per-page-select" name="per_page" class="form-select form-select-sm" style="width: auto;">
+                        <option value="5" {{ $perPage == 5 ? 'selected' : '' }}>5</option>
+                        <option value="10" {{ $perPage == 10 ? 'selected' : '' }}>10</option>
+                        <option value="20" {{ $perPage == 20 ? 'selected' : '' }}>20</option>
+                        <option value="50" {{ $perPage == 50 ? 'selected' : '' }}>50</option>
+                    </select>
+                </form>
+                <span class="ms-2">items per page</span>
+            </div>
+            <div class="pagination-container">
+                {{ $books->links('pagination::bootstrap-4') }}
+            </div>
         </div>
         <style>
             .pagination-container .page-link {

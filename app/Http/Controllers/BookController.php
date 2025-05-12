@@ -30,10 +30,18 @@ class BookController extends Controller
         return view('books.show', compact('book'));
     }
     
-    public function adminIndex()
+    public function adminIndex(Request $request)
     {
-        $books = Book::paginate(10);
-        return view('admin.books.index', compact('books'));
+        // Get per page preference (default to 5)
+        $perPage = $request->input('per_page', 5);
+        
+        // Validate per page is one of the allowed values
+        if (!in_array($perPage, [5, 10, 20, 50])) {
+            $perPage = 5;
+        }
+        
+        $books = Book::paginate($perPage)->withQueryString();
+        return view('admin.books.index', compact('books', 'perPage'));
     }
     
     public function create()

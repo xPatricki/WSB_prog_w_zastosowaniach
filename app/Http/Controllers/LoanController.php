@@ -21,7 +21,7 @@ class LoanController extends Controller
             ->where('user_id', Auth::id())
             ->whereNotNull('returned_at')
             ->orderBy('returned_at', 'desc')
-            ->get();
+            ->paginate(5);
             
         return view('loans.index', compact('activeLoans', 'returnedLoans'));
     }

@@ -54,10 +54,10 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::put('/admin/users/{user}', [AdminUserController::class, 'update'])->name('admin.users.update');
     Route::delete('/admin/users/{user}', [AdminUserController::class, 'destroy'])->name('admin.users.destroy');
     
-    // Admin loans management - using the AdminLoanController
-    Route::get('/admin/loans', function () {
-        return view('admin.loans.index');
-    })->name('admin.loans.index');
+    // Admin loans management
+    Route::get('/admin/loans', [\App\Http\Controllers\Admin\LoanController::class, 'index'])->name('admin.loans.index');
+    Route::post('/admin/loans/{loan}/cancel', [\App\Http\Controllers\Admin\LoanController::class, 'cancel'])->name('admin.loans.cancel');
+    Route::post('/admin/loans/{loan}/modify-due-date', [\App\Http\Controllers\Admin\LoanController::class, 'modifyDueDate'])->name('admin.loans.modify-due-date');
     
 
 });
