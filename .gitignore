@@ -21,9 +21,6 @@ yarn-error.log*
 /storage/logs/manual_debug.log
 /storage/logs/*.log
 
-# env files
-.env*
-
 # vercel
 .vercel
 
