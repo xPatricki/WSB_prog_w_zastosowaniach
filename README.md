@@ -6,11 +6,12 @@
 
 ## Project Overview
 
-This Library Management System is a web application that allows librarians to manage books, users, and loans efficiently. It features role-based access control with three user types:
+This Library Management System is a web application that allows librarians to manage books, users, and loans efficiently. It features role-based access control with four user types:
 
 - **Administrators**: Full system access including user management
 - **Bookkeepers**: Book and loan management
 - **Regular Users**: Browse books and manage their own loans
+- **Guests**: Browse available books (no login required)
 
 ## Features
 
@@ -25,10 +26,11 @@ This Library Management System is a web application that allows librarians to ma
 
 ## Requirements
 
-- PHP 8.1 or higher
+- PHP 8.2 or higher
 - Composer
-- MySQL or another Laravel-supported database
+- MySQL 8.0 or higher
 - Node.js and npm (for frontend assets)
+- Docker Desktop (optional, for containerized setup)
 
 ## Installation
 
@@ -50,7 +52,6 @@ npm run build
 ### Step 3: Configure Environment
 
 ```bash
-cp .env.example .env
 php artisan key:generate
 ```
 
@@ -60,10 +61,12 @@ Edit the `.env` file to configure your database connection:
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=library_management
-DB_USERNAME=your_database_username
-DB_PASSWORD=your_database_password
+DB_DATABASE=wsb_2024_k07_10
+DB_USERNAME=root
+DB_PASSWORD=
 ```
+
+Make sure to create the `wsb_2024_k07_10` database in your MySQL server before proceeding.
 
 ### Step 4: Setup Database
 
@@ -88,6 +91,12 @@ php artisan serve
 ```
 
 Access the application at http://localhost:8000
+
+Make sure no other applications are using port 8000. If you need to use a different port, you can specify it with:
+
+```bash
+php artisan serve --port=8888
+```
 
 ## Default Login Credentials
 
@@ -149,8 +158,10 @@ If you encounter issues:
 
 - Check storage permissions (storage directory should be writable)
 - Ensure database connection is properly configured
+- Verify the database `wsb_2024_k07_10` exists in your MySQL server
 - Look at Laravel logs in `storage/logs/laravel.log`
 - Verify the public storage symlink exists
+- If cover images aren't displaying, run `php artisan storage:link` to create the necessary symlink
 
 ## Adding Books via Bulk Add
 
@@ -190,19 +201,20 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 
 ---
 
-# WSB Library App (Dockerized Laravel)
+## Running with Docker
 
-## Prerequisites (Windows)
+Alternatively, you can run the application using Docker, which provides a consistent environment across different operating systems.
+
+### Prerequisites
 
 - **Docker Desktop** (https://www.docker.com/products/docker-desktop/)
   - Make sure Docker Desktop is running before you start the app.
-- **Git** (optional, for cloning the repo)
 
-## Getting Started
+### Docker Setup Steps
 
 1. **Clone the repository** (if you haven't already):
    ```sh
-   git clone <your-repo-url>
+   git clone https://github.com/xPatricki/WSB_prog_w_zastosowaniach.git
    cd WSB_prog_w_zastosowaniach
    ```
 
@@ -210,33 +222,22 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
    ```sh
    docker compose up --build
    ```
-   - This will build and start the app, database, and phpMyAdmin.
+   This will build and start the app, database, and phpMyAdmin.
 
 3. **Run database migrations and seeders:**
    (In a new terminal, with containers running)
    ```sh
-   docker compose exec app php artisan migrate:fresh
-   docker compose exec app php artisan db:seed
+   docker compose exec app php artisan migrate:fresh --seed
    ```
 
 4. **Access the app:**
-   - Laravel app: [http://localhost:8000](http://localhost:8000)
+   - Library application: [http://localhost:8000](http://localhost:8000)
    - phpMyAdmin: [http://localhost:8080](http://localhost:8080) (host: `db`, user: `laravel`, pass: `password`)
 
-## Demo Admin Credentials
-- **Email:** `admin@admin.com`
-- **Password:** `admin`
+### Troubleshooting Docker Setup
 
-## Features
-- Admin dashboard with charts and statistics
-- Book management (add, edit, delete, view)
-- User management
-- Loan management
-
-## Troubleshooting
 - If you get database or migration errors, try:
   ```sh
-  docker compose exec app php artisan migrate:fresh
-  docker compose exec app php artisan db:seed
+  docker compose exec app php artisan migrate:fresh --seed
   ```
-- Make sure Docker Desktop is running and no other services are using ports 8000/8080/3306.
+- Make sure Docker Desktop is running and no other services are using ports 8000, 8080, or 3306.
