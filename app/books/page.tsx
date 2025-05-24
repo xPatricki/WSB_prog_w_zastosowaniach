@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { BookOpen, Search } from "lucide-react"
 
 export default function BooksPage() {
-  // This would be replaced with actual data from a database
+
   const books = Array.from({ length: 12 }).map((_, i) => ({
     id: i + 1,
     title: `Book Title ${i + 1}`,

@@ -18,11 +18,10 @@ class ProfileController extends Controller
             'new_password' => 'nullable|string|min:6|confirmed',
         ]);
 
-        // Update name and email
         $user->name = $validated['name'];
         $user->email = $validated['email'];
 
-        // If changing password, validate current password
+
         if (!empty($validated['new_password'])) {
             if (empty($validated['current_password']) || !Hash::check($validated['current_password'], $user->password)) {
                 return response()->json([

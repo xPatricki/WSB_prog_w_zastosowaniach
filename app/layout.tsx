@@ -11,8 +11,7 @@ const inter = Inter({ subsets: ["latin"] })
 
 export const metadata = {
   title: "Library App",
-  description: "A modern library management system",
-    generator: 'v0.dev'
+  description: "A modern library management system"
 }
 
 export default function RootLayout({

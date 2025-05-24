@@ -28,18 +28,15 @@ class LoanController extends Controller
     
     public function borrow(Book $book)
     {
-        // Ensure user is authenticated
         if (!Auth::check()) {
             return redirect()->route('login')
                 ->with('error', 'You must be logged in to borrow books.');
         }
 
-        // Only users with 'user' role can borrow books
         if (Auth::user()->role !== 'user') {
             return back()->with('error', 'Only regular users can borrow books.');
         }
 
-        // Check if user already has a copy of this book
         $hasBookAlready = Loan::where('user_id', Auth::id())
             ->where('book_id', $book->id)
             ->whereNull('returned_at')
@@ -49,7 +46,6 @@ class LoanController extends Controller
             return back()->with('error', 'You already have a copy of this book. You can only borrow one copy of each book.');
         }
         
-        // Check if user has reached the maximum allowed books (3)
         $currentlyBorrowedCount = Loan::where('user_id', Auth::id())
             ->whereNull('returned_at')
             ->count();
@@ -68,10 +64,9 @@ class LoanController extends Controller
         $loan->user_id = Auth::id();
         $loan->book_id = $book->id;
         $loan->borrowed_at = now();
-        $loan->due_at = now()->addDays(14); // 2 weeks loan period
+        $loan->due_at = now()->addDays(14);
         $loan->save();
         
-        // If after this loan there are no copies left, set status to 'borrowed'
         $activeLoans++;
         if ($book->quantity - $activeLoans < 1) {
             $book->status = 'borrowed';

@@ -4,8 +4,7 @@ import { BookOpen, Clock, Users, BookMarked } from "lucide-react"
 import Link from "next/link"
 
 export default function Home() {
-  // This would be replaced with actual authentication state
-  const userRole = "guest" // Could be "guest", "user", or "admin"
+  const userRole = "guest"
 
   return (
     <div className="container py-10">

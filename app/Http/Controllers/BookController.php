@@ -32,10 +32,9 @@ class BookController extends Controller
     
     public function adminIndex(Request $request)
     {
-        // Get per page preference (default to 5)
+     
         $perPage = $request->input('per_page', 5);
         
-        // Validate per page is one of the allowed values
         if (!in_array($perPage, [5, 10, 20, 50])) {
             $perPage = 5;
         }
@@ -67,7 +66,7 @@ class BookController extends Controller
         $book->title = $validated['title'];
         $book->author = $validated['author'];
         $book->isbn = $validated['isbn'];
-        $book->genre_id = 1; // Ustawiam domyślnie genre_id=1, należałoby też dodać wybór gatunku w formularzu
+        $book->genre_id = 1;
         $book->description = $validated['description'] ?? null;
         $book->status = 'available';
         $book->featured = $request->has('featured');
@@ -146,23 +145,16 @@ class BookController extends Controller
             ->with('success', 'Book deleted successfully.');
     }
 
-    /**
-     * Bulk sync selected books (simulate sync for now)
-     */
     public function bulkSync(\Illuminate\Http\Request $request)
     {
         $ids = $request->input('ids', []);
         if (!is_array($ids) || empty($ids)) {
             return response()->json(['status' => 'error', 'message' => 'No books selected.'], 400);
         }
-        // Simulate sync: update updated_at timestamp
         Book::whereIn('id', $ids)->update(['updated_at' => now()]);
         return response()->json(['status' => 'success', 'message' => 'Selected books synced.']);
     }
 
-    /**
-     * Bulk delete selected books
-     */
     public function bulkDelete(\Illuminate\Http\Request $request)
     {
         $ids = $request->input('ids', []);

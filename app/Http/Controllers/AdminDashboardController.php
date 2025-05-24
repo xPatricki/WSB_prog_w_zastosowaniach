@@ -17,7 +17,6 @@ class AdminDashboardController extends Controller
                 return redirect()->route('login');
             }
             
-            // Case-insensitive role check
             $userRole = strtolower(auth()->user()->role);
             if ($userRole !== 'admin' && $userRole !== 'bookkeeper') {
                 abort(403, 'Unauthorized');
@@ -34,13 +33,11 @@ class AdminDashboardController extends Controller
         $activeLoans = Loan::where('status', 'active')->count();
         $expiredLoans = Loan::where('status', 'active')->where('due_at', '<', Carbon::now())->count();
 
-        // Book status pie chart
         $bookStatus = [
             'available' => Book::where('status', 'available')->count(),
             'borrowed' => $loanedBooks
         ];
 
-        // Show only the last 6 months (including current), no future months
         $months = collect(range(0, 5))->map(function ($i) {
             return Carbon::now()->subMonths(5 - $i)->format('F');
         });
