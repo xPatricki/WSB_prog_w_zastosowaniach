@@ -55,16 +55,6 @@ npm run build
 php artisan key:generate
 ```
 
-Edit the `.env` file to configure your database connection:
-
-```
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=wsb_2024_k07_10
-DB_USERNAME=root
-DB_PASSWORD=
-```
 
 Make sure to create the `wsb_2024_k07_10` database in your MySQL server before proceeding.
 
