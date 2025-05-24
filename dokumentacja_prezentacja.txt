@@ -1,0 +1,82 @@
+# Dokumentacja Systemu Zarządzania Biblioteką
+
+## Funkcje systemu
+
+System Zarządzania Biblioteką to kompleksowa aplikacja internetowa służąca do efektywnego zarządzania księgozbiorem, użytkownikami i wypożyczeniami. System umożliwia pełną digitalizację procesów bibliotecznych i zapewnia intuicyjny interfejs dla wszystkich typów użytkowników.
+
+### Główne funkcjonalności:
+
+1. **Zarządzanie kontami użytkowników**:
+   - System kontroli dostępu oparty na rolach (RBAC) z czterema typami użytkowników:
+     * Administratorzy: pełny dostęp do systemu, w tym zarządzanie użytkownikami
+     * Bibliotekarze: zarządzanie książkami i wypożyczeniami
+     * Zwykli użytkownicy: przeglądanie i wypożyczanie książek
+     * Guest: przeglądanie książek
+
+2. **Zarządzanie książkami**:
+   - Dodawanie, edycja i usuwanie książek
+   - Masowe dodawanie książek za pomocą numerów ISBN
+   - Automatyczne pobieranie danych książek z API OpenLibrary
+   - Zapisywanie i wyświetlanie okładek książek
+   - Kategoryzacja książek według gatunków
+
+3. **System wypożyczeń**:
+   - Wypożyczanie i zwrot książek
+   - Śledzenie terminów zwrotu
+   - Historia wypożyczeń dla każdego użytkownika
+   - Ograniczenia wypożyczeń:
+     * Maksymalnie 3 książki na użytkownika
+     * Tylko jedna kopia danej książki na użytkownika
+   - Modyfikacja terminów zwrotu przez administratorów
+
+4. **Panel administracyjny**:
+   - Statystyki i analityka
+   - Zarządzanie użytkownikami
+   - Zaawansowane zarządzanie wypożyczeniami
+   - Masowe operacje na książkach (synchronizacja, usuwanie)
+
+5. **Wyszukiwanie i filtrowanie**:
+   - Wyszukiwanie książek po tytule i autorze
+   - Filtrowanie wypożyczeń według statusu
+   - Sortowanie wyników
+
+## Wykorzystane technologie
+
+1. **Backend**:
+   - PHP 8.1+
+   - Laravel (framework PHP)
+   - MySQL (baza danych)
+   - Eloquent ORM (Object-Relational Mapping)
+   - Blade (system szablonów)
+   - Composer (zarządzanie zależnościami PHP)
+
+2. **Frontend**:
+   - HTML5, CSS3, JavaScript
+   - TailwindCSS (framework CSS)
+   - ReactJS komponenty (Radix UI)
+   - Responsywny design (dostosowanie do urządzeń mobilnych)
+
+3. **Dodatkowe narzędzia i technologie**:
+   - OpenLibrary API (pobieranie metadanych książek)
+   - Bootstrap (elementy interfejsu)
+   - Node.js i npm (zarządzanie zależnościami frontendowymi)
+
+4. **Środowisko uruchomieniowe**:
+   - Docker (konteneryzacja aplikacji)
+   - XAMPP (alternatywne środowisko lokalne)
+
+## Uruchamianie aplikacji
+
+Aplikację można uruchomić na dwa sposoby:
+
+### Docker (zalecane):
+System został skonteneryzowany przy użyciu Dockera, co zapewnia jednolite środowisko uruchomieniowe niezależnie od systemu operacyjnego. Wymaga zainstalowanego Docker Desktop.
+
+### XAMPP:
+Alternatywnie, aplikacja może być uruchomiona lokalnie przy użyciu XAMPP, który zawiera Apache, MySQL, PHP i Perl.
+
+## Autorzy
+
+- Dawid Skrzypacz
+- Patryk Pawlicki
+- Witold Mikołajczak
