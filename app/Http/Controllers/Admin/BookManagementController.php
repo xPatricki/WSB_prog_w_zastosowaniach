@@ -21,7 +21,7 @@ class BookManagementController extends Controller
     {
         $query = Book::query();
         
-        // Apply search filter
+
         if ($request->has('search')) {
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
@@ -31,7 +31,7 @@ class BookManagementController extends Controller
             });
         }
         
-        // Apply status filter
+
         if ($request->has('status') && $request->input('status') !== 'all') {
             $query->where('status', $request->input('status'));
         }
@@ -65,11 +65,6 @@ class BookManagementController extends Controller
      */
     public function store(Request $request)
     {
-        file_put_contents(storage_path('logs/manual_debug.log'), "[store] called at ".now()."\n[store] request: ".json_encode($request->all())."\n", FILE_APPEND);
-
-        \Log::info('Book store step 1: incoming request', [
-            'request_all' => $request->all(),
-        ]);
 
         $validated = $request->validate([
             'title' => 'required|max:255',
@@ -79,10 +74,6 @@ class BookManagementController extends Controller
             'description' => 'nullable',
             'cover_image' => 'nullable|image|max:2048',
         ]);
-        \Log::info('Book store step 2: validated', [
-            'validated' => $validated,
-            'cover_image_url_from_request' => $request->input('cover_image_url'),
-        ]);
 
         $book = new Book();
         $book->title = $validated['title'];
@@ -90,12 +81,8 @@ class BookManagementController extends Controller
         $book->isbn = $validated['isbn'];
         $book->genre_id = $validated['genre_id'];
         $book->description = $validated['description'] ?? null;
-        \Log::info('Book store step 3: after base properties', [
-            'cover_image_url_from_request' => $request->input('cover_image_url'),
-            'cover_image_url_on_book' => $book->cover_image_url ?? null,
-        ]);
 
-        // Set status
+
         $book->status = 'available';
 
         // Handle cover image upload or URL
@@ -103,27 +90,16 @@ class BookManagementController extends Controller
             $path = $request->file('cover_image')->store('covers', 'public');
             $book->cover_image = $path;
             $book->cover_image_url = null;
-            \Log::info('Book store step 4: after file upload', [
-                'cover_image' => $book->cover_image,
-                'cover_image_url' => $book->cover_image_url,
-            ]);
+
         } else {
             $book->cover_image = null;
             $book->cover_image_url = $request->input('cover_image_url');
-            \Log::info('Book store step 5: after setting url', [
-                'cover_image_url' => $book->cover_image_url,
-            ]);
+
         }
 
-        \Log::info('Book store step 6: before save', [
-            'book' => $book->toArray(),
-        ]);
 
         $book->save();
 
-        \Log::info('Book store step 7: after save', [
-            'book' => $book->toArray(),
-        ]);
 
         return redirect()->route('admin.books.index')
             ->with('success', 'Book added successfully.');
@@ -174,33 +150,33 @@ if ($request->filled('cover_image_url')) {
         
         // Handle cover image upload or URL
         if ($request->hasFile('cover_image')) {
-            // Delete old image if exists
+
             if ($book->cover_image) {
                 Storage::disk('public')->delete($book->cover_image);
             }
             $path = $request->file('cover_image')->store('covers', 'public');
             $book->cover_image = $path;
-            $book->cover_image_url = null; // Clear URL if file uploaded
+            $book->cover_image_url = null;
         } elseif ($request->filled('cover_image_url')) {
-            // Delete old image if exists
+
             if ($book->cover_image) {
                 Storage::disk('public')->delete($book->cover_image);
             }
             
-            // Download and store the cover image locally
+
             $coverUrl = $request->input('cover_image_url');
             $localPath = $this->downloadAndStoreCoverImage($coverUrl, $book->isbn);
             
             if ($localPath) {
-                // Successfully downloaded, use local image
+
                 $book->cover_image = $localPath;
-                $book->cover_image_url = null; // No longer needed as we have a local copy
-                \Log::info("Saved local cover for book ID {$book->id}, ISBN {$book->isbn}: {$localPath}");
+                $book->cover_image_url = null;
+
             } else {
-                // Failed to download, keep using the URL
+
                 $book->cover_image_url = $coverUrl;
                 $book->cover_image = null;
-                \Log::warning("Could not download cover for book ID {$book->id}, using external URL");
+
             }
         }
         
@@ -218,13 +194,13 @@ if ($request->filled('cover_image_url')) {
      */
     public function destroy(Book $book)
     {
-        // Check if book has active loans
+
         if ($book->loans()->where('status', 'active')->exists()) {
             return redirect()->route('admin.books.index')
                 ->with('error', 'Cannot delete book with active loans.');
         }
         
-        // Delete cover image if exists
+
         if ($book->cover_image) {
             Storage::disk('public')->delete($book->cover_image);
         }
@@ -244,23 +220,20 @@ if ($request->filled('cover_image_url')) {
      */
     public function bulkAdd(Request $request)
     {
-        file_put_contents(storage_path('logs/manual_debug.log'), "[bulkAdd] called at ".now()."\n[bulkAdd] request: ".json_encode($request->all())."\n", FILE_APPEND);
-        
+
         $validated = $request->validate([
             'isbns' => 'required|string',
             'quantity' => 'required|integer|min:1',
             'featured' => 'sometimes|boolean',
         ]);
         
-        file_put_contents(storage_path('logs/manual_debug.log'), "[bulkAdd] validated data: ".json_encode($validated)."\n", FILE_APPEND);
-        
-        // Parse ISBNs from input (separated by commas or newlines)
+
+
         $isbns = preg_split('/[\n\r,\s]+/', $validated['isbns'], -1, PREG_SPLIT_NO_EMPTY);
         
-        file_put_contents(storage_path('logs/manual_debug.log'), "[bulkAdd] parsed ISBNs: ".json_encode($isbns)."\n", FILE_APPEND);
-        
+
         if (empty($isbns)) {
-            file_put_contents(storage_path('logs/manual_debug.log'), "[bulkAdd] Error: No valid ISBNs provided\n", FILE_APPEND);
+
             return redirect()->route('admin.books.index')
                 ->with('error', 'No valid ISBNs provided.');
         }
@@ -277,7 +250,7 @@ if ($request->filled('cover_image_url')) {
             $isbn = trim($isbn);
             if (empty($isbn)) continue;
             
-            // Check if book already exists
+
             if (\App\Models\Book::where('isbn', $isbn)->exists()) {
                 $messages[] = "ISBN {$isbn}: Already exists in database";
                 $skipped++;
@@ -285,7 +258,7 @@ if ($request->filled('cover_image_url')) {
             }
             
             try {
-                file_put_contents(storage_path('logs/manual_debug.log'), "[bulkAdd] Processing ISBN: {$isbn}\n", FILE_APPEND);
+
                 
                 // Call the OpenLibrary API
                 $apiUrl = "https://openlibrary.org/api/books?bibkeys=ISBN:{$isbn}&format=json&jscmd=data";
@@ -301,19 +274,19 @@ if ($request->filled('cover_image_url')) {
                 
                 $openLibraryData = $bookData["ISBN:{$isbn}"];
                 
-                // Create new book
+
                 $book = new \App\Models\Book();
                 $book->isbn = $isbn;
                 $book->status = 'available';
                 $book->quantity = $quantity;
                 $book->featured = $featured;
-                $book->genre_id = 1; // Default to genre ID 1
+                $book->genre_id = 1;
                 
-                // Set data from API
+
                 if (isset($openLibraryData['title'])) {
                     $book->title = $openLibraryData['title'];
                 } else {
-                    $book->title = "Book " . $isbn; // Fallback title
+                    $book->title = "Book " . $isbn;
                 }
                 
                 if (isset($openLibraryData['authors']) && is_array($openLibraryData['authors']) && !empty($openLibraryData['authors'])) {
@@ -321,7 +294,7 @@ if ($request->filled('cover_image_url')) {
                         return $author['name'];
                     }, $openLibraryData['authors']));
                 } else {
-                    $book->author = "Unknown"; // Fallback author
+                    $book->author = "Unknown";
                 }
                 
                 if (isset($openLibraryData['notes'])) {
@@ -345,11 +318,11 @@ if ($request->filled('cover_image_url')) {
                     $added++;
                     $messages[] = "ISBN {$isbn}: Added successfully";
                 } catch (\Exception $saveEx) {
-                    throw $saveEx; // Re-throw to be caught by the outer catch block
+                    throw $saveEx;
                 }
                 
             } catch (\Exception $e) {
-                \Log::error("[Bulk Add] Error adding ISBN {$isbn}: " . $e->getMessage());
+
                 $messages[] = "ISBN {$isbn}: Error - " . $e->getMessage();
                 $skipped++;
             }
@@ -360,7 +333,7 @@ if ($request->filled('cover_image_url')) {
                   ($skipped > 0 ? ", skipped {$skipped} duplicates" : "") .
                   ($notFound > 0 ? ", {$notFound} not found" : "");
         
-        // Store detailed messages in session flash data
+
         session()->flash('bulk_messages', $messages);
         
         return redirect()->route('admin.books.index')
@@ -382,24 +355,24 @@ if ($request->filled('cover_image_url')) {
         }
         
         try {
-            // Generate a unique filename including the ISBN
+
             $extension = pathinfo(parse_url($imageUrl, PHP_URL_PATH), PATHINFO_EXTENSION) ?: 'jpg';
             $filename = 'covers/' . $isbn . '_' . Str::random(8) . '.' . $extension;
             
-            // Download the image
+
             $response = Http::timeout(5)->get($imageUrl);
             
             if ($response->successful()) {
-                // Store the image content
+
                 Storage::disk('public')->put($filename, $response->body());
                 
-                // Log the successful download
-                \Log::info("Downloaded cover image for ISBN {$isbn} from {$imageUrl} to {$filename}");
+
+
                 
                 return $filename;
             }
         } catch (\Exception $e) {
-            \Log::error("Failed to download cover for ISBN {$isbn}: " . $e->getMessage());
+            // Silent fail on production
         }
         
         return null;
@@ -430,9 +403,9 @@ if ($request->filled('cover_image_url')) {
             }
             
             try {
-                \Log::info("[Book Sync] Syncing book ID $id ({$book->title}) with ISBN: {$book->isbn}");
+
                 
-                // Skip books without ISBN
+
                 if (empty($book->isbn)) {
                     $results[$id] = ['status' => 'error', 'message' => 'Missing ISBN'];
                     $errorCount++;
@@ -459,7 +432,7 @@ if ($request->filled('cover_image_url')) {
                 
                 $openLibraryData = $bookData["ISBN:{$isbn}"];
                 
-                // Update book data
+
                 if (isset($openLibraryData['title'])) {
                     $book->title = $openLibraryData['title'];
                 }
@@ -493,7 +466,7 @@ if ($request->filled('cover_image_url')) {
                 $updatedCount++;
                 
             } catch (\Exception $e) {
-                \Log::error("[Book Sync] Error syncing book ID $id: " . $e->getMessage());
+
                 $results[$id] = ['status' => 'error', 'message' => 'Sync error: ' . $e->getMessage()];
                 $errorCount++;
             }

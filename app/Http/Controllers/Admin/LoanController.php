@@ -19,23 +19,23 @@ class LoanController extends Controller
      */
     public function index(Request $request)
     {
-        // Get search parameters
+
         $search = $request->input('search');
         $sortBy = $request->input('sort_by', 'due_at');
         $sortDirection = $request->input('sort_direction', 'asc');
         $status = $request->input('status', 'active');
         
-        // Query builder for loans
+
         $loansQuery = Loan::with(['user', 'book']);
         
-        // Filter by status
+
         if ($status === 'active') {
             $loansQuery->whereNull('returned_at');
         } elseif ($status === 'returned') {
             $loansQuery->whereNotNull('returned_at');
         }
         
-        // Apply search
+
         if ($search) {
             $loansQuery->where(function($query) use ($search) {
                 $query->whereHas('user', function($q) use ($search) {
@@ -49,7 +49,7 @@ class LoanController extends Controller
             });
         }
         
-        // Apply sorting
+
         if ($sortBy === 'due_at') {
             $loansQuery->orderBy('due_at', $sortDirection);
         } elseif ($sortBy === 'borrowed_at') {
@@ -64,10 +64,10 @@ class LoanController extends Controller
                     ->select('loans.*');
         }
         
-        // Paginate results
+
         $loans = $loansQuery->paginate(10)->withQueryString();
         
-        // Pass info to the view
+
         return view('admin.loans.index', compact('loans', 'search', 'sortBy', 'sortDirection', 'status'));
     }
     
@@ -79,16 +79,16 @@ class LoanController extends Controller
      */
     public function cancel(Loan $loan)
     {
-        // Check if already returned
+
         if ($loan->returned_at) {
             return back()->with('error', 'This book has already been returned.');
         }
         
-        // Mark as returned
+
         $loan->returned_at = now();
         $loan->save();
         
-        // Update book status if needed
+
         $book = $loan->book;
         $book->status = 'available';
         $book->save();
@@ -105,17 +105,17 @@ class LoanController extends Controller
      */
     public function modifyDueDate(Request $request, Loan $loan)
     {
-        // Validate request
+
         $request->validate([
             'due_at' => 'required|date|after:borrowed_at',
         ]);
         
-        // Check if already returned
+
         if ($loan->returned_at) {
             return back()->with('error', 'Cannot modify due date for already returned books.');
         }
         
-        // Update due date
+
         $loan->due_at = Carbon::parse($request->due_at);
         $loan->save();
         
